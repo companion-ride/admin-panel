@@ -89,7 +89,7 @@ export default function RidesPage() {
             price: r.price != null ? `${Number(r.price).toLocaleString("ru-RU")} ₸` : "—",
             distance: r.distanceM != null ? `${(Number(r.distanceM) / 1000).toFixed(1)} km` : String(r.distance ?? "—"),
             duration: r.totalDuration != null ? `${Math.round(Number(r.totalDuration) / 60)} min` : String(r.duration ?? "—"),
-            date: r.createdAt ? new Date(String(r.createdAt)).toLocaleDateString("ru-RU", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) : String(r.date ?? r.created_at ?? "—"),
+            date: r.createdAt ? new Date(String(r.createdAt).endsWith("Z") ? String(r.createdAt) : String(r.createdAt) + "Z").toLocaleDateString("ru-RU", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) : String(r.date ?? r.created_at ?? "—"),
             paymentMethod: String(r.paymentMethod ?? r.payment_method ?? "—"),
           })))
           setIsLive(true)

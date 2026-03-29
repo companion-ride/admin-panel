@@ -56,7 +56,7 @@ export function RecentRidesTable() {
               status: (["completed", "in_progress", "cancelled", "pending"].includes(String(r.status)) ? r.status : "pending") as RecentRide["status"],
               price: r.price != null ? `${Number(r.price).toLocaleString("ru-RU")} ₸` : "—",
               date: r.created_at
-                ? new Date(String(r.created_at)).toLocaleDateString("ru-RU", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })
+                ? new Date(String(r.created_at).endsWith("Z") ? String(r.created_at) : String(r.created_at) + "Z").toLocaleDateString("ru-RU", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })
                 : "—",
             })))
             setBackendDown(false)
@@ -80,7 +80,7 @@ export function RecentRidesTable() {
               status: (["completed", "in_progress", "cancelled", "pending"].includes(String(r.status)) ? r.status : "pending") as RecentRide["status"],
               price: r.price != null ? `${Number(r.price).toLocaleString("ru-RU")} ₸` : "—",
               date: r.createdAt
-                ? new Date(String(r.createdAt)).toLocaleDateString("ru-RU", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })
+                ? new Date(String(r.createdAt).endsWith("Z") ? String(r.createdAt) : String(r.createdAt) + "Z").toLocaleDateString("ru-RU", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })
                 : String(r.date ?? "—"),
             })))
             setBackendDown(false)
