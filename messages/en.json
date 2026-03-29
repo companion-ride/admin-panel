@@ -1,0 +1,462 @@
+{
+  "common": {
+    "save": "Save Changes",
+    "saved": "Saved!",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "export": "Export",
+    "refresh": "Refresh",
+    "search": "Search",
+    "loading": "Loading...",
+    "noResults": "No results found",
+    "actions": "Actions",
+    "status": {
+      "active": "Active",
+      "suspended": "Suspended",
+      "pending": "Pending",
+      "trial": "Trial"
+    },
+    "plan": {
+      "enterprise": "Enterprise",
+      "professional": "Pro",
+      "starter": "Starter",
+      "trial": "Trial",
+      "free": "Free"
+    },
+    "rideStatus": {
+      "completed": "Completed",
+      "in_progress": "In Progress",
+      "cancelled": "Cancelled",
+      "pending": "Pending",
+      "searching": "Searching",
+      "waiting": "Waiting"
+    },
+    "types": {
+      "driver": "Driver",
+      "passenger": "Passenger",
+      "admin": "Admin"
+    },
+    "ticketStatus": {
+      "open": "Open",
+      "pending": "Pending"
+    },
+    "demo": "Demo",
+    "noActiveRides": "No active rides",
+    "noRidesYet": "No rides yet",
+    "phone": "Phone",
+    "registered": "Registered",
+    "saving": "Saving...",
+    "connectionError": "Connection error",
+    "inDevelopment": "In development",
+    "pageNotUsed": "This page is not yet in use",
+    "rides": "Rides",
+    "searching": "Searching...",
+    "ride": "Ride",
+    "sections": { "users": "Users", "rides": "Rides", "admins": "Admins" },
+    "days": { "mon": "Mon", "tue": "Tue", "wed": "Wed", "thu": "Thu", "fri": "Fri", "sat": "Sat", "sun": "Sun" },
+    "months": { "jan": "Jan", "feb": "Feb", "mar": "Mar", "apr": "Apr", "may": "May", "jun": "Jun", "jul": "Jul", "aug": "Aug", "sep": "Sep", "oct": "Oct", "nov": "Nov", "dec": "Dec" },
+    "ticketPreview1": "Can't find a driver in my area...",
+    "ticketPreview2": "OTP code is not arriving on my phone...",
+    "yesterday": "Yesterday"
+  },
+  "sidebar": {
+    "brand": "Companion",
+    "subtitle": "Admin Panel",
+    "sections": {
+      "overview": "Overview",
+      "users": "Users",
+      "rides": "Rides",
+      "finance": "Finance",
+      "platform": "Platform"
+    },
+    "nav": {
+      "overview": "Overview",
+      "map": "Map",
+      "users": "Users",
+      "companies": "Companies",
+      "rides": "Rides",
+      "matching": "Matching",
+      "billing": "Commissions & Payments",
+      "support": "Support",
+      "settings": "Settings",
+      "admins": "Administrators"
+    },
+    "admin": "Admin",
+    "superAdmin": "Super Admin",
+    "signOut": "Sign Out"
+  },
+  "dashboard": {
+    "title": "Overview",
+    "subtitle": "Platform metrics for",
+    "checkingApi": "Checking API…",
+    "apiOnline": "API Online",
+    "apiOffline": "API Offline",
+    "live": "LIVE",
+    "refresh": "Refresh",
+    "export": "Export",
+    "stats": {
+      "totalRides": "Total Rides",
+      "activeUsers": "Active Users",
+      "openTickets": "Open Tickets",
+      "systemHealth": "System Health"
+    },
+    "recentEvents": "Recent Events",
+    "newTickets": "New Tickets",
+    "viewAll": "View all →",
+    "activeRides": "Active Rides",
+    "recentRides": "Recent Rides",
+    "viewAllRides": "View all rides",
+    "table": {
+      "id": "ID",
+      "passenger": "Passenger",
+      "driver": "Driver",
+      "route": "Route",
+      "status": "Status",
+      "price": "Price",
+      "eta": "ETA",
+      "rideId": "Ride ID",
+      "date": "Date"
+    },
+    "chartTitle": "Rides Trend",
+    "last7months": "Last 7 months",
+    "last12months": "Last 12 months",
+    "recentTickets": "Recent Tickets",
+    "chart": {
+      "week": "Week",
+      "month": "Month",
+      "3months": "3 mo",
+      "year": "Year",
+      "custom": "Custom"
+    }
+  },
+  "admins": {
+    "title": "Administrators",
+    "subtitle": "Manage accounts and access permissions",
+    "invite": "Invite",
+    "noAccess": "You don't have access to this page",
+    "noAdmins": "No administrators",
+    "table": { "name": "Name", "phone": "Phone", "role": "Role", "status": "Status", "created": "Created" },
+    "roles": { "super": "Super Admin", "admin": "Administrator" },
+    "inviteModal": {
+      "title": "Invite Administrator",
+      "subtitle": "A confirmation code will be sent to the specified number",
+      "name": "Name",
+      "namePlaceholder": "Enter name",
+      "phone": "Phone number",
+      "phonePlaceholder": "+7 700 000 0000",
+      "send": "Send invitation",
+      "sending": "Sending...",
+      "sent": "Invitation sent to {phone}",
+      "error": "Failed to send invitation"
+    }
+  },
+  "users": {
+    "title": "Users",
+    "subtitle": "Manage passengers and drivers",
+    "total": "{count} total",
+    "filters": {
+      "all": "All",
+      "passengers": "Passengers",
+      "drivers": "Drivers",
+      "admins": "Admins"
+    },
+    "searchPlaceholder": "Search by name or ID…",
+    "table": {
+      "user": "User",
+      "type": "Role",
+      "status": "Status",
+      "rides": "Rides",
+      "rating": "Rating",
+      "lastActive": "Last Active"
+    },
+    "noUsers": "No users found",
+    "drawer": {
+      "totalRides": "Total Rides",
+      "rating": "Rating",
+      "lastActive": "Last Active",
+      "vehicle": "Vehicle",
+      "car": "Car",
+      "licensePlate": "License Plate",
+      "suspendUser": "Suspend",
+      "activateUser": "Activate",
+      "viewRides": "Rides"
+    }
+  },
+  "companies": {
+    "title": "Companies",
+    "subtitle": "{count} organizations · MRR",
+    "addCompany": "Add Company",
+    "filters": {
+      "all": "All",
+      "active": "Active",
+      "trial": "Trial"
+    },
+    "searchPlaceholder": "Search by name or owner...",
+    "table": {
+      "company": "Company",
+      "owner": "Owner",
+      "users": "Users",
+      "status": "Status",
+      "plan": "Plan",
+      "mrr": "MRR",
+      "joined": "Joined"
+    },
+    "noCompanies": "No companies found",
+    "showing": "Showing",
+    "of": "of",
+    "companies": "companies",
+    "bulk": {
+      "selected": "{count} selected",
+      "suspend": "Suspend",
+      "changePlan": "Change Plan",
+      "cancel": "Cancel"
+    }
+  },
+  "billing": {
+    "title": "Commissions & Payments",
+    "subtitle": "Commission rate: {rate}%",
+    "stats": {
+      "collected": "Collected this month",
+      "driversPaid": "{count} drivers paid",
+      "pending": "Pending payment",
+      "driversCount": "{count} drivers",
+      "activeDrivers": "Active drivers",
+      "madeRides": "made rides",
+      "avgCommission": "Avg commission",
+      "perDriver": "per driver"
+    },
+    "model": {
+      "title": "Companion commission model",
+      "text": "Each driver is charged {rate}% of their total ride earnings monthly. Payment is due by the 10th of the following month. Accounts are automatically suspended after 30 days overdue."
+    },
+    "table": {
+      "title": "Payments",
+      "driver": "Driver",
+      "rides": "Rides",
+      "earnings": "Earnings",
+      "commission": "Commission ({rate}%)",
+      "status": "Status",
+      "deadline": "Deadline"
+    },
+    "filters": { "all": "All" },
+    "paymentStatus": {
+      "paid": "Paid",
+      "pending": "Pending",
+      "overdue": "Overdue"
+    },
+    "drawer": {
+      "currentPeriod": "Current period",
+      "ridesCompleted": "Rides completed",
+      "totalEarnings": "Total earnings",
+      "commissionRate": "Commission rate",
+      "toPay": "To pay",
+      "paymentStatus": "Payment status",
+      "paidOn": "Paid on {date}",
+      "dueDate": "Due date: {date}",
+      "overdueFrom": "Overdue since {date}",
+      "history": "Payment history",
+      "ridesAndEarnings": "{rides} rides · {earned}",
+      "markPaid": "Mark as paid"
+    }
+  },
+  "rides": {
+    "title": "Rides",
+    "subtitle": "Monitor all rides across the platform",
+    "total": "{count} total",
+    "filters": {
+      "all": "All",
+      "active": "Active",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "pending": "Pending"
+    },
+    "searchPlaceholder": "Search by ID, passenger, driver...",
+    "table": {
+      "rideId": "Ride ID",
+      "passenger": "Passenger",
+      "driver": "Driver",
+      "route": "Route",
+      "status": "Status",
+      "price": "Price",
+      "date": "Date"
+    },
+    "noRides": "No rides found",
+    "drawer": {
+      "route": "Route",
+      "pickup": "Pickup",
+      "dropoff": "Dropoff",
+      "distance": "Distance",
+      "duration": "Duration",
+      "price": "Price",
+      "payment": "Payment",
+      "passenger": "Passenger",
+      "driver": "Driver"
+    }
+  },
+  "support": {
+    "title": "Support Tickets",
+    "subtitle": "View and respond to user support requests",
+    "searchPlaceholder": "Search tickets...",
+    "filters": {
+      "all": "All",
+      "open": "Open",
+      "pending": "Pending",
+      "resolved": "Resolved",
+      "closed": "Closed"
+    },
+    "noTickets": "No tickets found",
+    "resolve": "Resolve",
+    "replyPlaceholder": "Type your reply...",
+    "selectTicket": "Select a ticket",
+    "selectTicketDesc": "Choose a support ticket from the list to view the conversation",
+    "status": {
+      "open": "Open",
+      "pending": "Pending",
+      "resolved": "Resolved",
+      "closed": "Closed"
+    },
+    "priority": {
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low"
+    },
+    "adminSender": "Admin",
+    "justNow": "Just now",
+    "ticketData": {
+      "t001": {
+        "subject": "Driver didn't show up",
+        "category": "Rides",
+        "createdAt": "Feb 22, 14:15",
+        "lastUpdated": "15 min ago",
+        "m1": "I ordered a ride 30 minutes ago, the driver accepted the order, but never showed up. The app still shows '2 minutes'. I'm late for work, please help!",
+        "m2": "Ride ID R-10248. Can you check what happened?"
+      },
+      "t002": {
+        "subject": "Double charge for a ride",
+        "category": "Payment",
+        "createdAt": "Feb 22, 13:00",
+        "lastUpdated": "1 hr ago",
+        "m1": "Hello, I was charged twice for the ride from Khan Shatyr to the airport. The ride cost 3,500 tenge, but I see two charges of 3,500 in my bank statement.",
+        "m2": "Hello, Maria! Thank you for reaching out. I'm checking the payment history. Please provide the ride ID.",
+        "m3": "Ride ID R-10247. Attaching a screenshot from the banking app showing two charges."
+      },
+      "t003": {
+        "subject": "App crashes when ordering",
+        "category": "Technical Issues",
+        "createdAt": "Feb 22, 11:30",
+        "lastUpdated": "3 hr ago",
+        "m1": "Every time I tap 'Confirm Order', the app immediately closes. I've restarted the app and phone — doesn't help.",
+        "m2": "Hi, Ruslan! Sorry for the inconvenience. Please provide your phone model and OS version.",
+        "m3": "Samsung Galaxy A54, Android 14. App version 1.2.3.",
+        "m4": "Thank you. We found this bug, the team is working on a fix. It will be resolved in the next update (v1.2.4)."
+      },
+      "t004": {
+        "subject": "Can't change phone number",
+        "category": "Account",
+        "createdAt": "Feb 21, 16:00",
+        "lastUpdated": "Yesterday",
+        "m1": "I changed my phone number and want to update it in the app, but I can't find that setting.",
+        "m2": "Hi, Elena! Changing the number requires verification. Go to Profile → Security → Change Phone Number.",
+        "m3": "Found it, thank you! Everything worked."
+      },
+      "t005": {
+        "subject": "Driver was rude",
+        "category": "Complaint",
+        "createdAt": "Feb 22, 12:00",
+        "lastUpdated": "2 hr ago",
+        "m1": "The driver in ride R-10244 behaved very rudely and aggressively while driving. I felt a safety threat."
+      },
+      "t006": {
+        "subject": "Promo code doesn't work",
+        "category": "Payment",
+        "createdAt": "Feb 20, 09:00",
+        "lastUpdated": "2 days ago",
+        "m1": "I'm trying to apply promo code WELCOME50, but the system says it's invalid.",
+        "m2": "Hello, Dinara! The promo code WELCOME50 has expired. New code: NEWUSER30 — gives 30% off on the first 3 rides.",
+        "m3": "Thank you, it worked!"
+      }
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Configure your admin panel preferences",
+    "saveChanges": "Save Changes",
+    "saved": "Saved!",
+    "api": {
+      "title": "API Configuration",
+      "subtitle": "Backend endpoints and third-party keys",
+      "baseUrl": "API Base URL",
+      "gisKey": "2GIS API Key",
+      "whatsappToken": "WhatsApp Token (OTP)"
+    },
+    "params": {
+      "title": "App Parameters",
+      "subtitle": "Pricing, matching and platform settings",
+      "commission": "Platform Commission (%)",
+      "alpha": "Discount Coefficient α",
+      "gracePeriod": "Grace Period (min)",
+      "matchRadius": "Matching Radius (m)",
+      "womenOnly": "Women-Only Mode"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "subtitle": "Manage notification preferences",
+      "supportAlerts": "New support ticket alerts",
+      "cancellationAlerts": "Ride cancellation alerts",
+      "downtimeAlerts": "System downtime alerts"
+    },
+    "security": {
+      "title": "Security",
+      "subtitle": "Admin panel access settings",
+      "password": "Admin Password"
+    }
+  },
+  "map": {
+    "title": "Driver Map",
+    "subtitle": "Active drivers in real time",
+    "onRide": "{count} on ride",
+    "available": "{count} available",
+    "legend": "Legend",
+    "activeDriversList": "Active Drivers",
+    "driversOnline": "online",
+    "statusOnRide": "On ride",
+    "statusAvailable": "Available",
+    "rating": "Rating",
+    "todayLabel": "Today",
+    "todayRides": "{count} rides",
+    "ridesUnit": "rides",
+    "totalRides": "Total rides"
+  },
+  "matching": {
+    "title": "Matching",
+    "subtitle": "Algorithm and platform parameters",
+    "stats": {
+      "matchRate": "Match Rate",
+      "avgWait": "Avg Wait Time",
+      "maxDetour": "Max Detour",
+      "noShow": "No-Show Rate"
+    },
+    "params": {
+      "title": "Matching Parameters",
+      "radius": "Search Radius (m)",
+      "detour": "Max Detour (%)",
+      "waitTimeout": "Wait Timeout (min)",
+      "gracePeriod": "Grace Period (min)",
+      "batchInterval": "Batch Interval (sec)",
+      "womenOnly": "Women-Only Mode",
+      "commission": "Platform Commission (%)",
+      "alpha": "Discount Coefficient α",
+      "saveParams": "Save Parameters",
+      "saved": "Saved!"
+    },
+    "corridors": {
+      "title": "Almaty Corridors",
+      "subtitle": "High-demand commute routes",
+      "status": {
+        "active": "Active",
+        "night": "Night",
+        "paused": "Paused"
+      }
+    }
+  }
+}
