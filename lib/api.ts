@@ -26,4 +26,7 @@ export async function apiFetch(endpoint: string, options: RequestInit = {}) {
   return res.json();
 }
 
-export { API_BASE_URL, BACKEND_URL, RIDES_URL };
+// Config service: https://companion.kopir.uk/api/config
+const CONFIG_URL = process.env.CONFIG_API_URL || API_BASE_URL.replace(/\/api\/auth\/?$/, "/api/config");
+
+export { API_BASE_URL, BACKEND_URL, RIDES_URL, CONFIG_URL };

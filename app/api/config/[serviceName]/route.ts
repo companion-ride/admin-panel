@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { verifyToken } from "@/lib/auth"
-
-const CONFIG_API = "https://companion.kopir.uk/api/config"
+import { CONFIG_URL } from "@/lib/api"
 
 function getBackendToken(request: NextRequest) {
   return request.cookies.get("backend_token")?.value ?? ""
@@ -20,7 +19,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
   const { serviceName } = await params
 
-  const res = await fetch(`${CONFIG_API}/service/${serviceName}`, {
+  const res = await fetch(`${CONFIG_URL}/service/${serviceName}`, {
     headers: {
       Authorization: `Bearer ${getBackendToken(request)}`,
       "ngrok-skip-browser-warning": "true",
@@ -39,7 +38,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   const { serviceName } = await params
   const body = await request.json()
 
-  const res = await fetch(`${CONFIG_API}/admin/config/${serviceName}`, {
+  const res = await fetch(`${CONFIG_URL}/admin/config/${serviceName}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

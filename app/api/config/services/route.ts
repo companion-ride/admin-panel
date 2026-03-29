@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { verifyToken } from "@/lib/auth"
-
-const CONFIG_API = "https://companion.kopir.uk/api/config"
+import { CONFIG_URL } from "@/lib/api"
 
 function getBackendToken(request: NextRequest) {
   return request.cookies.get("backend_token")?.value ?? ""
@@ -18,7 +17,7 @@ export async function GET(request: NextRequest) {
   const auth = await getAuth(request)
   if (!auth) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-  const res = await fetch(`${CONFIG_API}/admin/services`, {
+  const res = await fetch(`${CONFIG_URL}/admin/services`, {
     headers: {
       Authorization: `Bearer ${getBackendToken(request)}`,
       "ngrok-skip-browser-warning": "true",
@@ -36,7 +35,7 @@ export async function POST(request: NextRequest) {
 
   const body = await request.json()
 
-  const res = await fetch(`${CONFIG_API}/admin/services`, {
+  const res = await fetch(`${CONFIG_URL}/admin/services`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

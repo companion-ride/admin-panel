@@ -10,4 +10,5 @@ node_modules/
 .DS_Store
 
 # Admin data (contains hashed passwords)
-data/admins.jsonnode_modules 2/
+data/admins.json
+node_modules 2/

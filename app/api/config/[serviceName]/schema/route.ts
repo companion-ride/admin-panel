@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { verifyToken } from "@/lib/auth"
-
-const CONFIG_API = "https://companion.kopir.uk/api/config"
+import { CONFIG_URL } from "@/lib/api"
 
 function getBackendToken(request: NextRequest) {
   return request.cookies.get("backend_token")?.value ?? ""
@@ -21,7 +20,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   const { serviceName } = await params
   const body = await request.json()
 
-  const res = await fetch(`${CONFIG_API}/admin/schema/${serviceName}`, {
+  const res = await fetch(`${CONFIG_URL}/admin/schema/${serviceName}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
