@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react"
 import { AdminLayout } from "@/components/admin-layout"
 import { StatusBadge } from "@/components/status-badge"
 import { Search, RotateCw, MapPin, Eye, X, Inbox } from "lucide-react"
+import { SkeletonTable } from "@/components/skeleton"
 import { useTranslations } from "next-intl"
 
 function shortName(fullName: string) {
@@ -177,7 +178,7 @@ export default function RidesPage() {
             </thead>
             <tbody className="divide-y divide-border/50">
               {loading ? (
-                <tr><td colSpan={8} className="px-6 py-12 text-center text-muted-foreground text-sm">{tc("loading")}</td></tr>
+                <SkeletonTable rows={5} cols={8} />
               ) : rides.length === 0 ? (
                 <tr><td colSpan={8} className="px-6 py-16 text-center">
                   <div className="flex flex-col items-center gap-2 text-muted-foreground">

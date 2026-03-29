@@ -10,6 +10,7 @@ import { SupportPreview } from "@/components/dashboard/support-preview"
 import { Car, Users, MessageSquare, RefreshCw, Inbox } from "lucide-react"
 import { useTranslations } from "next-intl"
 import { useLocale } from "@/components/locale-provider"
+import { SkeletonCard, SkeletonTable } from "@/components/skeleton"
 
 interface DashboardStats {
   totalRides: number
@@ -44,6 +45,7 @@ export default function DashboardPage() {
   const tc = useTranslations("common")
   const { locale } = useLocale()
   const [refreshing, setRefreshing] = useState(false)
+  const [initialLoading, setInitialLoading] = useState(true)
   const [stats, setStats] = useState<DashboardStats>(FALLBACK_STATS)
   const [activeRides, setActiveRides] = useState<ActiveRide[]>(FALLBACK_RIDES)
   const [isLive, setIsLive] = useState(false)
@@ -96,6 +98,7 @@ export default function DashboardPage() {
 
           setIsLive(true)
           setBackendDown(false)
+          setInitialLoading(false)
           setRefreshing(false)
           return
         }
@@ -105,6 +108,7 @@ export default function DashboardPage() {
     }
 
     setBackendDown(true)
+    setInitialLoading(false)
     setRefreshing(false)
   }, [])
 
@@ -151,11 +155,17 @@ export default function DashboardPage() {
       </div>
 
       {/* Stat cards */}
-      <div className="grid grid-cols-3 gap-6 mb-8 stagger-children">
-        <StatCard title={t("stats.totalRides")} value={stats.totalRides.toLocaleString("ru-RU")} change="" changeType="positive" icon={Car} iconColor="text-primary" iconBg="bg-primary/10" />
-        <StatCard title={t("stats.activeUsers")} value={stats.activeUsers.toLocaleString("ru-RU")} change="" changeType="positive" icon={Users} iconColor="text-success" iconBg="bg-success/10" />
-        <StatCard title={t("stats.openTickets")} value={String(stats.openTickets)} change="" changeType="negative" icon={MessageSquare} iconColor="text-warning" iconBg="bg-warning/10" />
-      </div>
+      {initialLoading ? (
+        <div className="grid grid-cols-3 gap-6 mb-8">
+          <SkeletonCard /><SkeletonCard /><SkeletonCard />
+        </div>
+      ) : (
+        <div className="grid grid-cols-3 gap-6 mb-8 stagger-children">
+          <StatCard title={t("stats.totalRides")} value={stats.totalRides.toLocaleString("ru-RU")} change="" changeType="positive" icon={Car} iconColor="text-primary" iconBg="bg-primary/10" />
+          <StatCard title={t("stats.activeUsers")} value={stats.activeUsers.toLocaleString("ru-RU")} change="" changeType="positive" icon={Users} iconColor="text-success" iconBg="bg-success/10" />
+          <StatCard title={t("stats.openTickets")} value={String(stats.openTickets)} change="" changeType="negative" icon={MessageSquare} iconColor="text-warning" iconBg="bg-warning/10" />
+        </div>
+      )}
 
       {/* Charts + Support */}
       <div className="grid grid-cols-12 gap-6 mb-8">
@@ -174,7 +184,9 @@ export default function DashboardPage() {
             </div>
           )}
         </div>
-        {!backendDown && activeRides.length === 0 ? (
+        {initialLoading ? (
+          <div className="overflow-x-auto"><table className="w-full"><SkeletonTable rows={3} cols={7} /></table></div>
+        ) : !backendDown && activeRides.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 text-muted-foreground gap-2">
             <Inbox className="w-10 h-10 opacity-30" />
             <p className="text-sm">{tc("noActiveRides")}</p>

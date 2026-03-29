@@ -16,6 +16,7 @@ interface Toast {
   id: number
   message: string
   type: ToastType
+  removing?: boolean
 }
 
 interface ToastContextValue {
@@ -24,45 +25,57 @@ interface ToastContextValue {
 
 const ToastContext = createContext<ToastContextValue | null>(null)
 
+const ICON_MAP = {
+  ok: { icon: CheckCircle, bg: "bg-success/10", border: "border-success/30", color: "text-success" },
+  err: { icon: AlertCircle, bg: "bg-error/10", border: "border-error/30", color: "text-error" },
+  info: { icon: Info, bg: "bg-primary/10", border: "border-primary/30", color: "text-primary" },
+}
+
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([])
+
+  const removeToast = useCallback((id: number) => {
+    setToasts((prev) => prev.map((t) => t.id === id ? { ...t, removing: true } : t))
+    setTimeout(() => setToasts((prev) => prev.filter((t) => t.id !== id)), 300)
+  }, [])
 
   const toast = useCallback((message: string, type: ToastType = "info") => {
     const id = Date.now()
     setToasts((prev) => [...prev, { id, message, type }])
-    setTimeout(() => {
-      setToasts((prev) => prev.filter((t) => t.id !== id))
-    }, 3500)
-  }, [])
+    setTimeout(() => removeToast(id), 4000)
+  }, [removeToast])
 
   return (
     <ToastContext.Provider value={{ toast }}>
       {children}
-      <div className="fixed top-5 right-5 z-[200] flex flex-col gap-2 pointer-events-none">
-        {toasts.map((t) => (
-          <div
-            key={t.id}
-            className={cn(
-              "flex items-center gap-3 px-4 py-3 rounded-2xl border shadow-lg text-sm font-medium bg-card pointer-events-auto",
-              "animate-in slide-in-from-right-4 fade-in duration-200",
-              t.type === "ok" && "border-l-4 border-l-success",
-              t.type === "err" && "border-l-4 border-l-error",
-              t.type === "info" && "border-l-4 border-l-primary"
-            )}
-            style={{ maxWidth: 320 }}
-          >
-            {t.type === "ok" && <CheckCircle className="w-4 h-4 text-success flex-shrink-0" />}
-            {t.type === "err" && <AlertCircle className="w-4 h-4 text-error flex-shrink-0" />}
-            {t.type === "info" && <Info className="w-4 h-4 text-primary flex-shrink-0" />}
-            <span className="flex-1 text-foreground">{t.message}</span>
-            <button
-              onClick={() => setToasts((prev) => prev.filter((x) => x.id !== t.id))}
-              className="text-muted-foreground hover:text-foreground transition-colors flex-shrink-0"
+      <div className="fixed bottom-6 right-6 z-[200] flex flex-col-reverse gap-3 pointer-events-none">
+        {toasts.map((t) => {
+          const style = ICON_MAP[t.type]
+          const Icon = style.icon
+          return (
+            <div
+              key={t.id}
+              className={cn(
+                "flex items-center gap-3 pl-4 pr-3 py-3 rounded-xl border shadow-[0_8px_30px_-4px_rgba(0,0,0,0.15)] backdrop-blur-sm text-sm font-medium pointer-events-auto transition-all duration-300",
+                "bg-card/95",
+                style.border,
+                t.removing ? "opacity-0 translate-x-8" : "opacity-100 translate-x-0 animate-slide-in-up"
+              )}
+              style={{ minWidth: 280, maxWidth: 380 }}
             >
-              <X className="w-3.5 h-3.5" />
-            </button>
-          </div>
-        ))}
+              <div className={cn("w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0", style.bg)}>
+                <Icon className={cn("w-4 h-4", style.color)} />
+              </div>
+              <span className="flex-1 text-foreground leading-snug">{t.message}</span>
+              <button
+                onClick={() => removeToast(t.id)}
+                className="w-7 h-7 rounded-lg flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-all flex-shrink-0"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          )
+        })}
       </div>
     </ToastContext.Provider>
   )

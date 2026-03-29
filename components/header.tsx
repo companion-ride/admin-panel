@@ -127,6 +127,35 @@ export function Header() {
 
   // ─── Notifications logic ───
 
+  const NOTIF_SEEN_KEY = "companion_notif_seen_ids"
+  const NOTIF_READ_ALL_KEY = "companion_notif_read_all"
+  const POLL_INTERVAL = 30_000
+
+  function getReadIds(): Set<string> {
+    try {
+      const raw = localStorage.getItem(NOTIF_SEEN_KEY)
+      return raw ? new Set(JSON.parse(raw)) : new Set()
+    } catch { return new Set() }
+  }
+
+  function saveReadIds(ids: Set<string>) {
+    try { localStorage.setItem(NOTIF_SEEN_KEY, JSON.stringify([...ids])) } catch {}
+  }
+
+  function getReadAllTime(): string {
+    try { return localStorage.getItem(NOTIF_READ_ALL_KEY) || "" } catch { return "" }
+  }
+
+  function saveReadAllTime(ts: string) {
+    try { localStorage.setItem(NOTIF_READ_ALL_KEY, ts) } catch {}
+  }
+
+  function isRead(id: string, createdAt: string): boolean {
+    const readAll = getReadAllTime()
+    if (readAll && createdAt && createdAt <= readAll) return true
+    return getReadIds().has(id)
+  }
+
   function timeAgo(dateStr: string): string {
     const diff = Date.now() - new Date(dateStr).getTime()
     const mins = Math.floor(diff / 60000)
@@ -138,17 +167,27 @@ export function Header() {
     return locale === "ru" ? `${days} д назад` : locale === "kz" ? `${days} күн бұрын` : `${days}d ago`
   }
 
-  const fetchNotifications = useCallback(async () => {
-    setNotifLoading(true)
+  const fetchNotifications = useCallback(async (silent = false) => {
+    if (!silent) setNotifLoading(true)
     const notifs: Notification[] = []
 
+    // Read notification preferences
+    let notifPref = { users: true, rides: true, cancelled: true }
+    try { const raw = localStorage.getItem("companion_notif_settings"); if (raw) notifPref = JSON.parse(raw) } catch {}
+
     try {
-      // Recent users (new registrations)
-      const usersRes = await fetch("/api/users?limit=3")
-      if (usersRes.ok) {
-        const data = await usersRes.json()
+      // Use /admin/stats which returns recent_rides with driver/passenger names
+      const [statsRes, usersRes] = await Promise.allSettled([
+        fetch("/api/dashboard/stats"),
+        fetch("/api/users?limit=5"),
+      ])
+
+      // Users (if enabled)
+      if (notifPref.users && usersRes.status === "fulfilled" && usersRes.value.ok) {
+        const data = await usersRes.value.json().catch(() => null)
         for (const u of data?.items ?? []) {
           if (u.roles?.includes("admin")) continue
+          const createdAt = u.created_at || ""
           const roleTxt = u.roles?.includes("driver")
             ? (locale === "ru" ? "водитель" : locale === "kz" ? "жүргізуші" : "driver")
             : (locale === "ru" ? "пассажир" : locale === "kz" ? "жолаушы" : "passenger")
@@ -159,34 +198,47 @@ export function Header() {
             iconBg: "bg-primary/10",
             title: locale === "ru" ? "Новый пользователь" : locale === "kz" ? "Жаңа пайдаланушы" : "New user",
             description: `${u.name} — ${roleTxt}`,
-            time: timeAgo(u.created_at),
-            read: false,
+            time: createdAt ? timeAgo(createdAt) : "",
+            read: isRead(`user-${u.id}`, createdAt),
             href: "/users",
           })
         }
       }
 
-      // Recent rides
-      const ridesRes = await fetch("/api/rides?limit=3")
-      if (ridesRes.ok) {
-        const data = await ridesRes.json()
-        for (const r of data?.rides ?? data?.items ?? []) {
+      // Rides from stats
+      if (statsRes.status === "fulfilled" && statsRes.value.ok) {
+        const data = await statsRes.value.json().catch(() => null)
+        for (const r of data?.recent_rides ?? []) {
+          const createdAt = r.created_at || ""
           const statusKey = String(r.status)
           const isCancelled = statusKey === "cancelled"
           const isCompleted = statusKey === "completed"
+          const isActive = statusKey === "in_progress" || statusKey === "searching"
+
+          // Skip based on preferences
+          if (isCancelled && !notifPref.cancelled) continue
+          if (!isCancelled && !notifPref.rides) continue
+
+          const route = [r.from_address, r.to_address].filter(Boolean)
+          const desc = route.length === 2
+            ? `${String(route[0]).split(",")[0]} → ${String(route[1]).split(",")[0]}`
+            : r.driver_name || String(r.ride_id).slice(0, 12)
+
           notifs.push({
-            id: `ride-${r.id}`,
+            id: `ride-${r.ride_id}`,
             icon: isCancelled ? AlertTriangle : isCompleted ? CheckCircle : Car,
-            iconColor: isCancelled ? "text-error" : isCompleted ? "text-success" : "text-info",
-            iconBg: isCancelled ? "bg-error/10" : isCompleted ? "bg-success/10" : "bg-info/10",
+            iconColor: isCancelled ? "text-error" : isCompleted ? "text-success" : isActive ? "text-info" : "text-warning",
+            iconBg: isCancelled ? "bg-error/10" : isCompleted ? "bg-success/10" : isActive ? "bg-info/10" : "bg-warning/10",
             title: isCancelled
               ? (locale === "ru" ? "Поездка отменена" : locale === "kz" ? "Сапар бас тартылды" : "Ride cancelled")
               : isCompleted
               ? (locale === "ru" ? "Поездка завершена" : locale === "kz" ? "Сапар аяқталды" : "Ride completed")
+              : isActive
+              ? (locale === "ru" ? "Поездка в пути" : locale === "kz" ? "Сапар жолда" : "Ride in progress")
               : (locale === "ru" ? "Новая поездка" : locale === "kz" ? "Жаңа сапар" : "New ride"),
-            description: [r.fromAddress, r.toAddress].filter(Boolean).join(" → ") || String(r.id).slice(0, 12),
-            time: r.createdAt ? timeAgo(r.createdAt) : "",
-            read: isCompleted,
+            description: desc,
+            time: createdAt ? timeAgo(createdAt) : "",
+            read: isRead(`ride-${r.ride_id}`, createdAt),
             href: "/rides",
           })
         }
@@ -195,26 +247,39 @@ export function Header() {
       // silent
     }
 
-    // Sort by unread first
-    notifs.sort((a, b) => (a.read === b.read ? 0 : a.read ? 1 : -1))
+    // Sort: unread first, then by newest
+    notifs.sort((a, b) => {
+      if (a.read !== b.read) return a.read ? 1 : -1
+      return 0
+    })
     setNotifications(notifs)
-    setNotifLoading(false)
+    if (!silent) setNotifLoading(false)
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [locale])
 
+  // Auto-poll for new notifications
+  useEffect(() => {
+    fetchNotifications(true)
+    const interval = setInterval(() => fetchNotifications(true), POLL_INTERVAL)
+    return () => clearInterval(interval)
+  }, [fetchNotifications])
+
   function handleNotifToggle() {
-    if (!notifOpen) fetchNotifications()
     setNotifOpen(!notifOpen)
   }
 
   function handleNotifClick(n: Notification) {
     setNotifications((prev) => prev.map((p) => p.id === n.id ? { ...p, read: true } : p))
+    const ids = getReadIds()
+    ids.add(n.id)
+    saveReadIds(ids)
     setNotifOpen(false)
     if (n.href) router.push(n.href)
   }
 
   function markAllRead() {
     setNotifications((prev) => prev.map((p) => ({ ...p, read: true })))
+    saveReadAllTime(new Date().toISOString())
   }
 
   const unreadCount = notifications.filter((n) => !n.read).length

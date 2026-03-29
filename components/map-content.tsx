@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react"
 import { Star, Car, X, RefreshCw } from "lucide-react"
+import { SkeletonDriverCard } from "@/components/skeleton"
 import { cn } from "@/lib/utils"
 import { useTranslations } from "next-intl"
 import { useLocale } from "@/components/locale-provider"
@@ -65,7 +66,6 @@ export default function MapContent() {
   const [refreshing, setRefreshing] = useState(false)
   const [loaded, setLoaded] = useState(false)
   const [mapKey, setMapKey] = useState("")
-  const [scriptLoaded, setScriptLoaded] = useState(false)
   const mapRef = useRef<MapInstance | null>(null)
   const markersRef = useRef<MarkerInstance[]>([])
   const containerRef = useRef<HTMLDivElement>(null)
@@ -118,12 +118,24 @@ export default function MapContent() {
   }, [])
 
   useEffect(() => {
-    if (!scriptLoaded || !mapKey || !containerRef.current || !window.mapgl || mapRef.current) return
-    try {
-      mapRef.current = new window.mapgl.Map(containerRef.current, { center: ALMATY_CENTER, zoom: 13, key: mapKey })
-      setMapReady(true)
-    } catch { /* map init failed */ }
-  }, [scriptLoaded, mapKey])
+    if (!mapKey || !containerRef.current || mapRef.current) return
+
+    function tryInit() {
+      if (!window.mapgl || !containerRef.current) return false
+      try {
+        mapRef.current = new window.mapgl.Map(containerRef.current, { center: ALMATY_CENTER, zoom: 13, key: mapKey })
+        setMapReady(true)
+        return true
+      } catch { return false }
+    }
+
+    // Try immediately, then retry every 500ms until script loads
+    if (tryInit()) return
+    const interval = setInterval(() => {
+      if (tryInit()) clearInterval(interval)
+    }, 500)
+    return () => clearInterval(interval)
+  }, [mapKey])
 
   useEffect(() => {
     if (!mapReady || !mapRef.current || !window.mapgl) return
@@ -159,7 +171,7 @@ export default function MapContent() {
 
   return (
     <>
-      <Script src="https://mapgl.2gis.com/api/js/v1" onLoad={() => setScriptLoaded(true)} strategy="afterInteractive" />
+      <Script src="https://mapgl.2gis.com/api/js/v1" strategy="beforeInteractive" />
 
       <div className="mb-6 flex items-end justify-between">
         <div>
@@ -248,7 +260,10 @@ export default function MapContent() {
             <p className="text-xs text-muted-foreground mt-0.5">{drivers.length} {t("driversOnline")}</p>
           </div>
           <div className="p-3 flex flex-col gap-2">
-            {!backendDown && drivers.length === 0 && (
+            {!loaded && (
+              <>{Array.from({ length: 4 }).map((_, i) => <SkeletonDriverCard key={i} />)}</>
+            )}
+            {loaded && !backendDown && drivers.length === 0 && (
               <div className="flex flex-col items-center justify-center py-10 text-muted-foreground gap-2">
                 <Car className="w-8 h-8 opacity-20" />
                 <p className="text-xs text-center">{noDriversText}</p>

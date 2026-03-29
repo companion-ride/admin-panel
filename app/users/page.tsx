@@ -4,7 +4,8 @@ import { useState, useEffect, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { AdminLayout } from "@/components/admin-layout"
 import { StatusBadge } from "@/components/status-badge"
-import { Search, RotateCw, User, Car, X, ChevronRight, Inbox } from "lucide-react"
+import { Search, RotateCw, User, Car, X, ChevronRight, Inbox, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react"
+import { SkeletonTable } from "@/components/skeleton"
 import { cn } from "@/lib/utils"
 import { useTranslations } from "next-intl"
 import { useToast } from "@/components/toast"
@@ -70,7 +71,30 @@ export default function UsersPage() {
   const [filter, setFilter] = useState<FilterType>("all")
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedUser, setSelectedUser] = useState<ApiUser | null>(null)
+  const [sortKey, setSortKey] = useState<"name" | "phone" | "created_at" | null>(null)
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("asc")
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  function handleSort(key: "name" | "phone" | "created_at") {
+    if (sortKey === key) {
+      setSortDir(sortDir === "asc" ? "desc" : "asc")
+    } else {
+      setSortKey(key)
+      setSortDir("asc")
+    }
+  }
+
+  function sortedUsers(list: ApiUser[]) {
+    if (!sortKey) return list
+    return [...list].sort((a, b) => {
+      let va: string, vb: string
+      if (sortKey === "name") { va = a.name.toLowerCase(); vb = b.name.toLowerCase() }
+      else if (sortKey === "phone") { va = a.phone; vb = b.phone }
+      else { va = a.created_at; vb = b.created_at }
+      const cmp = va < vb ? -1 : va > vb ? 1 : 0
+      return sortDir === "asc" ? cmp : -cmp
+    })
+  }
 
   async function fetchUsers(role: FilterType, search: string) {
     setLoading(true)
@@ -209,16 +233,40 @@ export default function UsersPage() {
         <table className="w-full text-left border-collapse">
           <thead className="bg-muted/50 border-b border-border/50">
             <tr>
-              {[t("table.user"), t("table.type"), t("table.status"), tc("phone"), tc("registered"), ""].map((h) => (
-                <th key={h} className="px-5 py-4 text-[11px] font-bold text-muted-foreground/60 uppercase tracking-widest">{h}</th>
+              {([
+                { label: t("table.user"), key: "name" as const },
+                { label: t("table.type"), key: null },
+                { label: t("table.status"), key: null },
+                { label: tc("phone"), key: "phone" as const },
+                { label: tc("registered"), key: "created_at" as const },
+                { label: "", key: null },
+              ]).map((col, i) => (
+                <th key={col.label || i}
+                  className={cn(
+                    "px-5 py-4 text-[11px] font-bold uppercase tracking-widest",
+                    col.key
+                      ? "cursor-pointer select-none text-muted-foreground/60 hover:text-foreground transition-colors group"
+                      : "text-muted-foreground/60"
+                  )}
+                  onClick={() => col.key && handleSort(col.key)}
+                >
+                  <span className="inline-flex items-center gap-1.5">
+                    {col.label}
+                    {col.key && (
+                      sortKey === col.key
+                        ? sortDir === "asc"
+                          ? <ArrowUp className="w-3 h-3 text-primary" />
+                          : <ArrowDown className="w-3 h-3 text-primary" />
+                        : <ArrowUpDown className="w-3 h-3 opacity-0 group-hover:opacity-50 transition-opacity" />
+                    )}
+                  </span>
+                </th>
               ))}
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
             {loading ? (
-              <tr>
-                <td colSpan={6} className="px-6 py-12 text-center text-muted-foreground text-sm">{tc("loading")}</td>
-              </tr>
+              <SkeletonTable rows={5} cols={6} />
             ) : users.length === 0 ? (
               <tr>
                 <td colSpan={6} className="px-6 py-16 text-center">
@@ -228,7 +276,7 @@ export default function UsersPage() {
                   </div>
                 </td>
               </tr>
-            ) : users.map((user) => (
+            ) : sortedUsers(users).map((user) => (
               <tr
                 key={user.id}
                 className="hover:bg-muted/30 transition-all cursor-pointer"

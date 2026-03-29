@@ -9,6 +9,7 @@ import { useLocale } from "@/components/locale-provider"
 import {
   ShieldCheck, Shield, Lock, UserPlus, X, Inbox,
 } from "lucide-react"
+import { SkeletonTable } from "@/components/skeleton"
 
 interface BackendAdmin {
   id: string
@@ -124,7 +125,7 @@ export default function AdminsPage() {
 
       <div className="bg-card rounded-2xl border border-border shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] overflow-hidden">
         {loading ? (
-          <div className="p-12 text-center text-muted-foreground text-sm">{tc("loading")}</div>
+          <table className="w-full"><SkeletonTable rows={4} cols={5} /></table>
         ) : admins.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-muted-foreground gap-2">
             <Inbox className="w-10 h-10 opacity-30" />
