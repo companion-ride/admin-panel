@@ -1,5 +1,5 @@
 // Set timezone for server-side rendering
-process.env.TZ = "Asia/Almaty"
+process.env.TZ = process.env.APP_TIMEZONE || "Asia/Almaty"
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
