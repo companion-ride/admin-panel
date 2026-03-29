@@ -1,3 +1,6 @@
+// Set timezone for server-side rendering
+process.env.TZ = "Asia/Almaty"
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {

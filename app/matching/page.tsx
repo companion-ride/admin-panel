@@ -129,7 +129,7 @@ export default function MatchingPage() {
       <div className="grid grid-cols-4 gap-4 mb-8">
         <StatCard
           title={t("stats.matchRate")}
-          value={stats ? `${(stats.matchRate * 100).toFixed(1)}%` : "—"}
+          value={stats ? `${stats.matchRate.toFixed(1)}%` : "—"}
           change="" changeType="positive"
           icon={CheckCircle} iconColor="text-success" iconBg="bg-success/10"
         />
@@ -147,7 +147,7 @@ export default function MatchingPage() {
         />
         <StatCard
           title="Cancellation"
-          value={stats ? `${(stats.cancellationRate * 100).toFixed(1)}%` : "—"}
+          value={stats ? `${stats.cancellationRate.toFixed(1)}%` : "—"}
           change="" changeType="negative"
           icon={AlertTriangle} iconColor="text-error" iconBg="bg-error/10"
         />

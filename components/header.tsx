@@ -157,7 +157,9 @@ export function Header() {
   }
 
   function timeAgo(dateStr: string): string {
-    const diff = Date.now() - new Date(dateStr).getTime()
+    // Backend returns UTC without Z suffix — normalize
+    const normalized = dateStr.endsWith("Z") || dateStr.includes("+") ? dateStr : dateStr + "Z"
+    const diff = Date.now() - new Date(normalized).getTime()
     const mins = Math.floor(diff / 60000)
     if (mins < 1) return locale === "ru" ? "только что" : locale === "kz" ? "жаңа ғана" : "just now"
     if (mins < 60) return locale === "ru" ? `${mins} мин назад` : locale === "kz" ? `${mins} мин бұрын` : `${mins}m ago`
@@ -176,10 +178,11 @@ export function Header() {
     try { const raw = localStorage.getItem("companion_notif_settings"); if (raw) notifPref = JSON.parse(raw) } catch {}
 
     try {
-      // Use /admin/stats which returns recent_rides with driver/passenger names
-      const [statsRes, usersRes] = await Promise.allSettled([
+      // Fetch from both stats and rides APIs for comprehensive notifications
+      const [statsRes, usersRes, ridesRes] = await Promise.allSettled([
         fetch("/api/dashboard/stats"),
         fetch("/api/users?limit=5"),
+        fetch("/api/rides?limit=5"),
       ])
 
       // Users (if enabled)
@@ -239,6 +242,47 @@ export function Header() {
             description: desc,
             time: createdAt ? timeAgo(createdAt) : "",
             read: isRead(`ride-${r.ride_id}`, createdAt),
+            href: "/rides",
+          })
+        }
+      }
+      // Also add rides from rides-service (may have different/newer rides)
+      if (ridesRes.status === "fulfilled" && ridesRes.value.ok) {
+        const data = await ridesRes.value.json().catch(() => null)
+        const existingIds = new Set(notifs.map(n => n.id))
+        for (const r of data?.rides ?? data?.items ?? []) {
+          const rideId = `ride-${r.id}`
+          if (existingIds.has(rideId)) continue
+
+          const createdAt = r.createdAt || r.created_at || ""
+          const statusKey = String(r.status)
+          const isCancelled = statusKey === "cancelled"
+          const isCompleted = statusKey === "completed"
+          const isActive = statusKey === "in_progress" || statusKey === "searching"
+
+          if (isCancelled && !notifPref.cancelled) continue
+          if (!isCancelled && !notifPref.rides) continue
+
+          const route = [r.fromAddress, r.toAddress].filter(Boolean)
+          const desc = route.length === 2
+            ? `${String(route[0]).split(",")[0]} → ${String(route[1]).split(",")[0]}`
+            : String(r.id).slice(0, 12)
+
+          notifs.push({
+            id: rideId,
+            icon: isCancelled ? AlertTriangle : isCompleted ? CheckCircle : Car,
+            iconColor: isCancelled ? "text-error" : isCompleted ? "text-success" : isActive ? "text-info" : "text-warning",
+            iconBg: isCancelled ? "bg-error/10" : isCompleted ? "bg-success/10" : isActive ? "bg-info/10" : "bg-warning/10",
+            title: isCancelled
+              ? (locale === "ru" ? "Поездка отменена" : locale === "kz" ? "Сапар бас тартылды" : "Ride cancelled")
+              : isCompleted
+              ? (locale === "ru" ? "Поездка завершена" : locale === "kz" ? "Сапар аяқталды" : "Ride completed")
+              : isActive
+              ? (locale === "ru" ? "Поездка в пути" : locale === "kz" ? "Сапар жолда" : "Ride in progress")
+              : (locale === "ru" ? "Новая поездка" : locale === "kz" ? "Жаңа сапар" : "New ride"),
+            description: desc,
+            time: createdAt ? timeAgo(createdAt) : "",
+            read: isRead(rideId, createdAt),
             href: "/rides",
           })
         }

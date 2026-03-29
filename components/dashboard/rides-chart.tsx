@@ -136,6 +136,39 @@ export function RidesChart() {
 
     async function load() {
       try {
+        // For longer periods, try stats API first (has pre-aggregated monthly data)
+        if (period === "3months" || period === "year") {
+          const statsRes = await fetch("/api/dashboard/stats")
+          if (statsRes.ok) {
+            const statsData = await statsRes.json()
+            const chart = statsData?.rides_chart
+            if (Array.isArray(chart)) {
+              // Build a map from API data
+              const apiData: Record<string, number> = {}
+              for (const c of chart) {
+                apiData[c.month] = c.rides
+              }
+
+              // Generate all months for the period
+              const monthCount = period === "year" ? 12 : 3
+              const now = new Date()
+              const points: ChartPoint[] = []
+              for (let i = monthCount - 1; i >= 0; i--) {
+                const d = new Date(now.getFullYear(), now.getMonth() - i, 1)
+                const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`
+                points.push({
+                  label: monthNames[d.getMonth()],
+                  rides: apiData[key] ?? 0,
+                })
+              }
+              setData(points)
+              setBackendDown(false)
+              return
+            }
+          }
+        }
+
+        // For shorter periods or fallback, fetch individual rides
         const res = await fetch("/api/rides?limit=100")
         if (res.ok) {
           const json = await res.json()
