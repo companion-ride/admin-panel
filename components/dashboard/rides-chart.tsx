@@ -12,6 +12,7 @@ import {
 } from "recharts"
 import { useTranslations } from "next-intl"
 import { Calendar } from "lucide-react"
+import { DatePicker } from "@/components/date-picker"
 
 interface ChartPoint {
   label: string
@@ -205,19 +206,9 @@ export function RidesChart() {
 
       {showCustom && period === "custom" && (
         <div className="flex items-center gap-2 mb-4 animate-fade-in">
-          <input
-            type="date"
-            value={customFrom}
-            onChange={(e) => setCustomFrom(e.target.value)}
-            className="h-8 px-3 bg-muted border border-border/50 rounded-lg text-xs font-mono text-foreground focus:outline-none focus:ring-2 focus:ring-primary/10"
-          />
-          <span className="text-xs text-muted-foreground">—</span>
-          <input
-            type="date"
-            value={customTo}
-            onChange={(e) => setCustomTo(e.target.value)}
-            className="h-8 px-3 bg-muted border border-border/50 rounded-lg text-xs font-mono text-foreground focus:outline-none focus:ring-2 focus:ring-primary/10"
-          />
+          <DatePicker value={customFrom} onChange={setCustomFrom} />
+          <span className="text-xs text-muted-foreground font-bold">—</span>
+          <DatePicker value={customTo} onChange={setCustomTo} />
         </div>
       )}
 

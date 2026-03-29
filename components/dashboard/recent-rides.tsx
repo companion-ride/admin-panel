@@ -40,11 +40,36 @@ export function RecentRidesTable() {
   useEffect(() => {
     async function load() {
       try {
+        // Try /admin/stats first — it has recent_rides with enriched data
+        const statsRes = await fetch("/api/dashboard/stats")
+        if (statsRes.ok) {
+          const statsData = await statsRes.json()
+          const recent = statsData?.recent_rides
+          if (Array.isArray(recent) && recent.length > 0) {
+            setRides(recent.slice(0, 5).map((r: Record<string, unknown>) => ({
+              id: String(r.ride_id ?? ""),
+              passenger: Array.isArray(r.passenger_names) ? (r.passenger_names as string[]).join(", ") : "—",
+              driver: String(r.driver_name ?? "—"),
+              route: r.from_address && r.to_address
+                ? `${String(r.from_address).split(",")[0]} -> ${String(r.to_address).split(",")[0]}`
+                : "—",
+              status: (["completed", "in_progress", "cancelled", "pending"].includes(String(r.status)) ? r.status : "pending") as RecentRide["status"],
+              price: r.price != null ? `${Number(r.price).toLocaleString("ru-RU")} ₸` : "—",
+              date: r.created_at
+                ? new Date(String(r.created_at)).toLocaleDateString("ru-RU", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })
+                : "—",
+            })))
+            setBackendDown(false)
+            return
+          }
+        }
+
+        // Fallback to rides API
         const res = await fetch("/api/rides?limit=5")
         if (res.ok) {
           const data = await res.json()
           const items = Array.isArray(data) ? data : data?.rides ?? data?.items
-          if (Array.isArray(items)) {
+          if (Array.isArray(items) && items.length > 0) {
             setRides(items.map((r: Record<string, unknown>) => ({
               id: String(r.id ?? ""),
               passenger: String(r.passenger_name ?? r.passenger ?? "—"),

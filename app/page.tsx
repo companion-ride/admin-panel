@@ -64,68 +64,47 @@ export default function DashboardPage() {
 
   const fetchData = useCallback(async () => {
     setRefreshing(true)
-    let anySuccess = false
-
-    // Fetch dashboard stats (active users) + matching stats (total rides) in parallel
-    const [dashRes, matchRes] = await Promise.allSettled([
-      fetch("/api/dashboard/stats"),
-      fetch("/api/matching/stats"),
-    ])
-
-    if (dashRes.status === "fulfilled" && dashRes.value.ok) {
-      const data = await dashRes.value.json().catch(() => null)
-      if (data) {
-        setStats((prev) => ({
-          ...prev,
-          activeUsers: data.active_users ?? 0,
-        }))
-        anySuccess = true
-      }
-    }
-
-    if (matchRes.status === "fulfilled" && matchRes.value.ok) {
-      const data = await matchRes.value.json().catch(() => null)
-      if (data && !data.error) {
-        setStats((prev) => ({
-          ...prev,
-          totalRides: data.totalRides ?? 0,
-        }))
-        anySuccess = true
-      }
-    }
-
-    // Fetch active rides
     try {
-      const res = await fetch("/api/rides?status=in_progress&limit=10")
+      const res = await fetch("/api/dashboard/stats")
       if (res.ok) {
         const data = await res.json()
-        const items = Array.isArray(data) ? data : data?.rides ?? data?.items
-        if (Array.isArray(items)) {
-          setActiveRides(items.map((r: Record<string, unknown>) => ({
-            id: String(r.id ?? ""),
-            passenger: String(r.passenger_name ?? r.passenger ?? "—"),
-            driver: String(r.driverId ?? r.driver_name ?? r.driver ?? "—"),
-            route: r.fromAddress && r.toAddress
-              ? `${String(r.fromAddress).split(",")[0]} → ${String(r.toAddress).split(",")[0]}`
-              : String(r.route ?? `${r.pickup ?? ""} → ${r.dropoff ?? ""}`),
-            status: (r.status === "in_progress" || r.status === "searching" || r.status === "pending") ? r.status : "in_progress",
-            price: r.price != null ? `${Number(r.price).toLocaleString("ru-RU")} ₸` : "—",
-            eta: String(r.eta ?? "—"),
-          })))
-          anySuccess = true
+        if (data && !data.error) {
+          setStats({
+            totalRides: data.total_rides ?? 0,
+            activeUsers: data.active_users ?? 0,
+            openTickets: data.open_tickets ?? 0,
+          })
+
+          // Only show truly active rides (in_progress, searching, pending)
+          const recent = data.recent_rides ?? []
+          if (Array.isArray(recent)) {
+            const active = recent.filter((r: Record<string, unknown>) =>
+              r.status === "in_progress" || r.status === "searching"
+            )
+            setActiveRides(active.map((r: Record<string, unknown>) => ({
+              id: String(r.ride_id ?? ""),
+              passenger: Array.isArray(r.passenger_names) ? (r.passenger_names as string[]).join(", ") : "—",
+              driver: String(r.driver_name ?? "—"),
+              route: r.from_address && r.to_address
+                ? `${String(r.from_address).split(",")[0]} → ${String(r.to_address).split(",")[0]}`
+                : "—",
+              status: r.status as "in_progress" | "searching" | "pending",
+              price: r.price != null ? `${Number(r.price).toLocaleString("ru-RU")} ₸` : "—",
+              eta: "—",
+            })))
+          }
+
+          setIsLive(true)
+          setBackendDown(false)
+          setRefreshing(false)
+          return
         }
       }
     } catch {
       // fallback
     }
 
-    if (anySuccess) {
-      setIsLive(true)
-      setBackendDown(false)
-    } else {
-      setBackendDown(true)
-    }
-
+    setBackendDown(true)
     setRefreshing(false)
   }, [])
 
