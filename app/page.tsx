@@ -67,13 +67,19 @@ export default function DashboardPage() {
   const fetchData = useCallback(async () => {
     setRefreshing(true)
     try {
-      const res = await fetch("/api/dashboard/stats")
-      if (res.ok) {
-        const data = await res.json()
-        if (data && !data.error) {
+      // Fetch stats + real active users count in parallel
+      const [statsRes, usersCountRes] = await Promise.all([
+        fetch("/api/dashboard/stats"),
+        fetch("/api/users?status=active&limit=1"),
+      ])
+
+      const data = statsRes.ok ? await statsRes.json().catch(() => null) : null
+      const usersData = usersCountRes.ok ? await usersCountRes.json().catch(() => null) : null
+
+      if (data && !data.error) {
           setStats({
             totalRides: data.total_rides ?? 0,
-            activeUsers: data.active_users ?? 0,
+            activeUsers: usersData?.total ?? data.active_users ?? 0,
             openTickets: data.open_tickets ?? 0,
           })
 
@@ -102,7 +108,6 @@ export default function DashboardPage() {
           setRefreshing(false)
           return
         }
-      }
     } catch {
       // fallback
     }
