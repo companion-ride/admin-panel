@@ -37,7 +37,9 @@ export default function AdminsPage() {
   const [admins, setAdmins] = useState<BackendAdmin[]>([])
   const [loading, setLoading] = useState(true)
   const [inviteOpen, setInviteOpen] = useState(false)
+  const [inviteStep, setInviteStep] = useState<"phone" | "code">("phone")
   const [invite, setInvite] = useState<InviteFormData>(emptyInvite)
+  const [otpCode, setOtpCode] = useState("")
   const [formError, setFormError] = useState("")
   const [formLoading, setFormLoading] = useState(false)
 
@@ -62,7 +64,8 @@ export default function AdminsPage() {
     fetchAdmins()
   }, [fetchAdmins])
 
-  async function handleInvite(e: React.FormEvent) {
+  // Step 1: Send OTP
+  async function handleSendOtp(e: React.FormEvent) {
     e.preventDefault()
     setFormError("")
     setFormLoading(true)
@@ -74,15 +77,46 @@ export default function AdminsPage() {
       })
       const data = await res.json()
       if (!res.ok) { setFormError(data.error || t("inviteModal.error")); return }
+      setInviteStep("code")
+      setOtpCode("")
+    } catch {
+      setFormError(tc("connectionError"))
+    } finally {
+      setFormLoading(false)
+    }
+  }
+
+  // Step 2: Verify OTP
+  async function handleVerifyCode(e: React.FormEvent) {
+    e.preventDefault()
+    setFormError("")
+    setFormLoading(true)
+    try {
+      const res = await fetch("/api/admins/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone: invite.phone, code: otpCode }),
+      })
+      const data = await res.json()
+      if (!res.ok) { setFormError(data.error || (locale === "ru" ? "Неверный код" : locale === "kz" ? "Қате код" : "Invalid code")); return }
       setInviteOpen(false)
+      setInviteStep("phone")
       setInvite(emptyInvite)
-      toast(t("inviteModal.sent", { phone: invite.phone }), "ok")
+      setOtpCode("")
+      toast(locale === "ru" ? `${invite.name} добавлен как администратор` : locale === "kz" ? `${invite.name} әкімші ретінде қосылды` : `${invite.name} added as administrator`, "ok")
       fetchAdmins()
     } catch {
       setFormError(tc("connectionError"))
     } finally {
       setFormLoading(false)
     }
+  }
+
+  function closeInviteModal() {
+    setInviteOpen(false)
+    setInviteStep("phone")
+    setFormError("")
+    setOtpCode("")
   }
 
   function isSuper(a: BackendAdmin) {
@@ -113,7 +147,7 @@ export default function AdminsPage() {
         <div className="flex items-center gap-2">
           {(currentAdmin?.role === "super" || currentAdmin?.permissions?.inviteAdmins) && (
             <button
-              onClick={() => { setInvite(emptyInvite); setFormError(""); setInviteOpen(true) }}
+              onClick={() => { setInvite(emptyInvite); setFormError(""); setInviteStep("phone"); setOtpCode(""); setInviteOpen(true) }}
               className="h-10 px-5 bg-primary text-primary-foreground rounded-xl font-bold text-sm hover:bg-primary/90 transition-all flex items-center gap-2"
             >
               <UserPlus className="w-4 h-4" />
@@ -197,59 +231,113 @@ export default function AdminsPage() {
             <div className="flex items-center justify-between p-6 pb-4 border-b border-border/50">
               <div>
                 <h2 className="text-base font-bold text-foreground">{t("inviteModal.title")}</h2>
-                <p className="text-xs text-muted-foreground mt-0.5">{t("inviteModal.subtitle")}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  {inviteStep === "phone"
+                    ? t("inviteModal.subtitle")
+                    : locale === "ru" ? `Код отправлен на ${invite.phone}` : locale === "kz" ? `Код ${invite.phone} нөміріне жіберілді` : `Code sent to ${invite.phone}`}
+                </p>
               </div>
-              <button onClick={() => setInviteOpen(false)} className="text-muted-foreground hover:text-foreground transition-colors">
+              <button onClick={closeInviteModal} className="text-muted-foreground hover:text-foreground transition-colors">
                 <X className="w-5 h-5" />
               </button>
             </div>
-            <form onSubmit={handleInvite} className="p-6 flex flex-col gap-4">
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[13px] font-semibold text-foreground">{t("inviteModal.name")}</label>
-                <input
-                  value={invite.name}
-                  onChange={(e) => setInvite((f) => ({ ...f, name: e.target.value }))}
-                  placeholder={t("inviteModal.namePlaceholder")}
-                  required
-                  className="h-10 px-3.5 bg-background border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-muted-foreground"
-                />
-              </div>
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[13px] font-semibold text-foreground">{t("inviteModal.phone")}</label>
-                <input
-                  type="tel"
-                  value={invite.phone}
-                  onChange={(e) => setInvite((f) => ({ ...f, phone: e.target.value }))}
-                  placeholder={t("inviteModal.phonePlaceholder")}
-                  required
-                  className="h-10 px-3.5 bg-background border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-muted-foreground"
-                />
-              </div>
 
-              {formError && (
-                <div className="px-4 py-3 bg-error/8 border border-error/20 rounded-xl text-sm text-error font-medium">
-                  {formError}
+            {/* Step 1: Name + Phone */}
+            {inviteStep === "phone" && (
+              <form onSubmit={handleSendOtp} className="p-6 flex flex-col gap-4">
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-[13px] font-semibold text-foreground">{t("inviteModal.name")}</label>
+                  <input
+                    value={invite.name}
+                    onChange={(e) => setInvite((f) => ({ ...f, name: e.target.value }))}
+                    placeholder={t("inviteModal.namePlaceholder")}
+                    required
+                    className="h-10 px-3.5 bg-background border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-muted-foreground"
+                  />
                 </div>
-              )}
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-[13px] font-semibold text-foreground">{t("inviteModal.phone")}</label>
+                  <input
+                    type="tel"
+                    value={invite.phone}
+                    onChange={(e) => setInvite((f) => ({ ...f, phone: e.target.value }))}
+                    placeholder={t("inviteModal.phonePlaceholder")}
+                    required
+                    className="h-10 px-3.5 bg-background border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-muted-foreground"
+                  />
+                </div>
 
-              <div className="flex gap-3 mt-1">
-                <button
-                  type="button"
-                  onClick={() => setInviteOpen(false)}
-                  className="flex-1 h-10 border border-border rounded-xl text-sm font-bold text-foreground hover:bg-muted transition-all"
-                >
-                  {tc("cancel")}
-                </button>
-                <button
-                  type="submit"
-                  disabled={formLoading}
-                  className="flex-1 h-10 bg-primary text-primary-foreground rounded-xl text-sm font-bold hover:bg-primary/90 transition-all disabled:opacity-60 flex items-center justify-center gap-2"
-                >
-                  <UserPlus className="w-4 h-4" />
-                  {formLoading ? t("inviteModal.sending") : t("inviteModal.send")}
-                </button>
+                {formError && (
+                  <div className="px-4 py-3 bg-error/8 border border-error/20 rounded-xl text-sm text-error font-medium">{formError}</div>
+                )}
+
+                <div className="flex gap-3 mt-1">
+                  <button type="button" onClick={closeInviteModal}
+                    className="flex-1 h-10 border border-border rounded-xl text-sm font-bold text-foreground hover:bg-muted transition-all">
+                    {tc("cancel")}
+                  </button>
+                  <button type="submit" disabled={formLoading}
+                    className="flex-1 h-10 bg-primary text-primary-foreground rounded-xl text-sm font-bold hover:bg-primary/90 transition-all disabled:opacity-60 flex items-center justify-center gap-2">
+                    <UserPlus className="w-4 h-4" />
+                    {formLoading ? t("inviteModal.sending") : t("inviteModal.send")}
+                  </button>
               </div>
-            </form>
+              </form>
+            )}
+
+            {/* Step 2: Enter OTP code */}
+            {inviteStep === "code" && (
+              <form onSubmit={handleVerifyCode} className="p-6 flex flex-col gap-4 animate-fade-in">
+                <div className="flex items-center gap-3 p-3 bg-success/8 border border-success/20 rounded-xl">
+                  <div className="w-8 h-8 rounded-lg bg-success/10 flex items-center justify-center flex-shrink-0">
+                    <UserPlus className="w-4 h-4 text-success" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-foreground">{invite.name}</p>
+                    <p className="text-xs text-muted-foreground">{invite.phone}</p>
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-[13px] font-semibold text-foreground">
+                    {locale === "ru" ? "Код из SMS" : locale === "kz" ? "SMS коды" : "SMS code"}
+                  </label>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    maxLength={6}
+                    value={otpCode}
+                    onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                    placeholder="000000"
+                    required
+                    autoFocus
+                    className="h-12 px-4 bg-background border border-border rounded-xl text-lg font-mono tracking-[0.3em] text-center focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-muted-foreground/30"
+                  />
+                </div>
+
+                {formError && (
+                  <div className="px-4 py-3 bg-error/8 border border-error/20 rounded-xl text-sm text-error font-medium">{formError}</div>
+                )}
+
+                <div className="flex gap-3 mt-1">
+                  <button type="button" onClick={() => { setInviteStep("phone"); setFormError("") }}
+                    className="flex-1 h-10 border border-border rounded-xl text-sm font-bold text-foreground hover:bg-muted transition-all">
+                    {locale === "ru" ? "Назад" : locale === "kz" ? "Артқа" : "Back"}
+                  </button>
+                  <button type="submit" disabled={formLoading || otpCode.length < 6}
+                    className="flex-1 h-10 bg-primary text-primary-foreground rounded-xl text-sm font-bold hover:bg-primary/90 transition-all disabled:opacity-60 flex items-center justify-center gap-2">
+                    {formLoading
+                      ? (locale === "ru" ? "Проверка..." : locale === "kz" ? "Тексеруде..." : "Verifying...")
+                      : (locale === "ru" ? "Подтвердить" : locale === "kz" ? "Растау" : "Verify")}
+                  </button>
+                </div>
+
+                <button type="button" onClick={handleSendOtp} disabled={formLoading}
+                  className="text-xs font-bold text-primary hover:text-primary-hover transition-colors text-center disabled:opacity-50">
+                  {locale === "ru" ? "Отправить код повторно" : locale === "kz" ? "Кодты қайта жіберу" : "Resend code"}
+                </button>
+              </form>
+            )}
           </div>
         </div>
       )}
