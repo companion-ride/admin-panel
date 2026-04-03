@@ -29,4 +29,7 @@ export async function apiFetch(endpoint: string, options: RequestInit = {}) {
 // Config service: https://companion.kopir.uk/api/config
 const CONFIG_URL = process.env.CONFIG_API_URL || API_BASE_URL.replace(/\/api\/auth\/?$/, "/api/config");
 
-export { API_BASE_URL, BACKEND_URL, RIDES_URL, CONFIG_URL };
+// Chat service: https://companion.kopir.uk/api/chat
+const CHAT_URL = process.env.CHAT_API_URL || API_BASE_URL.replace(/\/api\/auth\/?$/, "/api/chat");
+
+export { API_BASE_URL, BACKEND_URL, RIDES_URL, CONFIG_URL, CHAT_URL };

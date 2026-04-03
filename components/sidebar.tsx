@@ -22,7 +22,7 @@ import { cn } from "@/lib/utils"
 import { useTranslations } from "next-intl"
 import { useLocale, type Locale } from "@/components/locale-provider"
 import { useAuth } from "@/components/auth-provider"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 
 const SIDEBAR_KEY = "companion_sidebar_collapsed"
 
@@ -33,6 +33,7 @@ export function Sidebar() {
   const { locale, setLocale } = useLocale()
   const { admin, refresh } = useAuth()
   const [collapsed, setCollapsed] = useState(false)
+  const [openTickets, setOpenTickets] = useState(0)
 
   useEffect(() => {
     try {
@@ -40,6 +41,22 @@ export function Sidebar() {
       if (saved === "true") setCollapsed(true)
     } catch {}
   }, [])
+
+  const fetchOpenTickets = useCallback(async () => {
+    try {
+      const res = await fetch("/api/tickets?status=open&limit=1")
+      if (res.ok) {
+        const data = await res.json()
+        setOpenTickets(data.total ?? 0)
+      }
+    } catch {}
+  }, [])
+
+  useEffect(() => {
+    fetchOpenTickets()
+    const interval = setInterval(fetchOpenTickets, 30000)
+    return () => clearInterval(interval)
+  }, [fetchOpenTickets])
 
   function toggleCollapsed() {
     const next = !collapsed
@@ -98,7 +115,7 @@ export function Sidebar() {
     {
       title: t("sections.platform"),
       items: [
-        { label: t("nav.support"), href: "/support", icon: MessageSquare, badge: "3", badgeColor: "bg-error text-primary-foreground" },
+        { label: t("nav.support"), href: "/support", icon: MessageSquare, ...(openTickets > 0 ? { badge: String(openTickets), badgeColor: "bg-error text-primary-foreground" } : {}) },
         { label: t("nav.settings"), href: "/settings", icon: Settings },
         ...(admin?.role === "super" || admin?.permissions?.viewAdmins
           ? [{ label: t("nav.admins"), href: "/admins", icon: UserCog }]
