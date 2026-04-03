@@ -184,7 +184,7 @@ export function RidesChart() {
           }
         }
       } catch {
-        // backend down
+        // backend down — use fallback
       }
       setBackendDown(true)
       setData(FALLBACK_DATA)

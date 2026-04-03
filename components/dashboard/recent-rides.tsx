@@ -69,7 +69,7 @@ export function RecentRidesTable() {
         if (res.ok) {
           const data = await res.json()
           const items = Array.isArray(data) ? data : data?.rides ?? data?.items
-          if (Array.isArray(items) && items.length > 0) {
+          if (Array.isArray(items)) {
             setRides(items.map((r: Record<string, unknown>) => ({
               id: String(r.id ?? ""),
               passenger: String(r.passenger_name ?? r.passenger ?? "—"),

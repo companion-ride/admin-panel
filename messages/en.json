@@ -121,6 +121,13 @@
     "last7months": "Last 7 months",
     "last12months": "Last 12 months",
     "recentTickets": "Recent Tickets",
+    "noTickets": "No tickets",
+    "timeAgo": {
+      "now": "just now",
+      "minutes": "{n} min ago",
+      "hours": "{n} h ago",
+      "days": "{n} d ago"
+    },
     "chart": {
       "week": "Week",
       "month": "Month",
@@ -430,9 +437,12 @@
   "matching": {
     "title": "Matching",
     "subtitle": "Algorithm and platform parameters",
+    "local": "Local",
     "stats": {
       "matchRate": "Match Rate",
       "avgWait": "Avg Wait Time",
+      "totalRides": "Total Rides",
+      "cancellation": "Cancellation",
       "maxDetour": "Max Detour",
       "noShow": "No-Show Rate"
     },
@@ -446,7 +456,13 @@
       "womenOnly": "Women-Only Mode",
       "commission": "Platform Commission (%)",
       "alpha": "Discount Coefficient α",
+      "pickupRadius": "Pickup Radius (m)",
+      "dropoffRadius": "Dropoff Radius (m)",
+      "maxPassengers": "Max Passengers",
+      "minDriverDistance": "Min Driver Distance (m)",
+      "minEta": "Min ETA (seconds)",
       "saveParams": "Save Parameters",
+      "saving": "Saving...",
       "saved": "Saved!"
     },
     "corridors": {

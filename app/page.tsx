@@ -67,34 +67,40 @@ export default function DashboardPage() {
   const fetchData = useCallback(async () => {
     setRefreshing(true)
     try {
-      // Fetch stats + real active users count in parallel
-      const [statsRes, usersCountRes] = await Promise.all([
+      // Fetch stats + real active users count + matching stats in parallel
+      const [statsRes, usersCountRes, matchingRes, ridesRes] = await Promise.all([
         fetch("/api/dashboard/stats"),
         fetch("/api/users?status=active&limit=1"),
+        fetch("/api/matching/stats"),
+        fetch("/api/rides?status=in_progress&limit=10"),
       ])
 
       const data = statsRes.ok ? await statsRes.json().catch(() => null) : null
       const usersData = usersCountRes.ok ? await usersCountRes.json().catch(() => null) : null
+      const matchingData = matchingRes.ok ? await matchingRes.json().catch(() => null) : null
+      const ridesData = ridesRes.ok ? await ridesRes.json().catch(() => null) : null
 
-      if (data && !data.error) {
+      const hasAnyData = (data && !data.error) || matchingData || ridesData
+
+      if (hasAnyData) {
           setStats({
-            totalRides: data.total_rides ?? 0,
-            activeUsers: usersData?.total ?? data.active_users ?? 0,
-            openTickets: data.open_tickets ?? 0,
+            totalRides: matchingData?.totalRides ?? data?.total_rides ?? 0,
+            activeUsers: usersData?.total ?? data?.active_users ?? 0,
+            openTickets: data?.open_tickets ?? 0,
           })
 
-          // Only show truly active rides (in_progress, searching, pending)
-          const recent = data.recent_rides ?? []
-          if (Array.isArray(recent)) {
-            const active = recent.filter((r: Record<string, unknown>) =>
+          // Active rides from rides service
+          const ridesList = ridesData?.rides ?? data?.recent_rides ?? []
+          if (Array.isArray(ridesList)) {
+            const active = ridesList.filter((r: Record<string, unknown>) =>
               r.status === "in_progress" || r.status === "searching"
             )
             setActiveRides(active.map((r: Record<string, unknown>) => ({
-              id: String(r.ride_id ?? ""),
-              passenger: Array.isArray(r.passenger_names) ? (r.passenger_names as string[]).join(", ") : "—",
-              driver: String(r.driver_name ?? "—"),
-              route: r.from_address && r.to_address
-                ? `${String(r.from_address).split(",")[0]} → ${String(r.to_address).split(",")[0]}`
+              id: String(r.id ?? r.ride_id ?? ""),
+              passenger: String(r.passenger_name ?? (Array.isArray(r.passenger_names) ? (r.passenger_names as string[]).join(", ") : "—")),
+              driver: String(r.driverId ?? r.driver_name ?? "—"),
+              route: (r.fromAddress || r.from_address) && (r.toAddress || r.to_address)
+                ? `${String(r.fromAddress ?? r.from_address).split(",")[0]} → ${String(r.toAddress ?? r.to_address).split(",")[0]}`
                 : "—",
               status: r.status as "in_progress" | "searching" | "pending",
               price: r.price != null ? `${Number(r.price).toLocaleString("ru-RU")} ₸` : "—",

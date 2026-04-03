@@ -109,7 +109,7 @@ export default function MatchingPage() {
           <div className="flex items-center gap-3">
             <h1 className="text-[32px] font-bold tracking-tight text-foreground">{t("title")}</h1>
             {!isLive && !loading && (
-              <span className="px-2.5 py-1 rounded-full bg-warning/10 border border-warning/20 text-[11px] font-bold text-warning-dark">Локальные</span>
+              <span className="px-2.5 py-1 rounded-full bg-warning/10 border border-warning/20 text-[11px] font-bold text-warning-dark">{t("local")}</span>
             )}
             {isLive && (
               <span className="px-2.5 py-1 rounded-full bg-success/10 border border-success/20 text-[11px] font-bold text-success">Live</span>
@@ -140,13 +140,13 @@ export default function MatchingPage() {
           icon={Clock} iconColor="text-info" iconBg="bg-info/10"
         />
         <StatCard
-          title="Total Rides"
+          title={t("stats.totalRides")}
           value={stats ? stats.totalRides.toLocaleString("ru-RU") : "—"}
           change="" changeType="positive"
           icon={Shuffle} iconColor="text-warning" iconBg="bg-warning/10"
         />
         <StatCard
-          title="Cancellation"
+          title={t("stats.cancellation")}
           value={stats ? `${stats.cancellationRate.toFixed(1)}%` : "—"}
           change="" changeType="negative"
           icon={AlertTriangle} iconColor="text-error" iconBg="bg-error/10"
@@ -161,7 +161,7 @@ export default function MatchingPage() {
           {/* Sliders */}
           <div>
             <div className="flex items-center justify-between mb-2">
-              <label className="text-sm text-muted-foreground">Pickup Radius (m)</label>
+              <label className="text-sm text-muted-foreground">{t("params.pickupRadius")}</label>
               <span className="text-sm font-bold text-foreground">{params.pickupRadiusM}</span>
             </div>
             <input type="range" min="500" max="10000" step="500" value={params.pickupRadiusM} onChange={(e) => setParams({ ...params, pickupRadiusM: Number(e.target.value) })} className="w-full accent-primary" />
@@ -169,7 +169,7 @@ export default function MatchingPage() {
 
           <div>
             <div className="flex items-center justify-between mb-2">
-              <label className="text-sm text-muted-foreground">Dropoff Radius (m)</label>
+              <label className="text-sm text-muted-foreground">{t("params.dropoffRadius")}</label>
               <span className="text-sm font-bold text-foreground">{params.dropoffRadiusM}</span>
             </div>
             <input type="range" min="500" max="10000" step="500" value={params.dropoffRadiusM} onChange={(e) => setParams({ ...params, dropoffRadiusM: Number(e.target.value) })} className="w-full accent-primary" />
@@ -178,7 +178,7 @@ export default function MatchingPage() {
           {/* Number inputs */}
           <div className="grid grid-cols-2 gap-4 pt-1">
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-bold text-muted-foreground/60 uppercase tracking-widest">Max Passengers</label>
+              <label className="text-xs font-bold text-muted-foreground/60 uppercase tracking-widest">{t("params.maxPassengers")}</label>
               <input
                 type="number" value={params.maxPassengers} min={1} max={10}
                 onChange={(e) => setParams({ ...params, maxPassengers: Number(e.target.value) })}
@@ -186,7 +186,7 @@ export default function MatchingPage() {
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-bold text-muted-foreground/60 uppercase tracking-widest">Min Driver Distance (m)</label>
+              <label className="text-xs font-bold text-muted-foreground/60 uppercase tracking-widest">{t("params.minDriverDistance")}</label>
               <input
                 type="number" value={params.minDriverDistanceM} min={100} max={20000} step={500}
                 onChange={(e) => setParams({ ...params, minDriverDistanceM: Number(e.target.value) })}
@@ -194,7 +194,7 @@ export default function MatchingPage() {
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-bold text-muted-foreground/60 uppercase tracking-widest">Min ETA (seconds)</label>
+              <label className="text-xs font-bold text-muted-foreground/60 uppercase tracking-widest">{t("params.minEta")}</label>
               <input
                 type="number" value={params.minEtaSeconds} min={60} max={3600} step={60}
                 onChange={(e) => setParams({ ...params, minEtaSeconds: Number(e.target.value) })}
@@ -208,7 +208,7 @@ export default function MatchingPage() {
             disabled={saving}
             className="h-11 w-full rounded-xl bg-primary text-primary-foreground text-sm font-bold hover:bg-primary-hover transition-all flex items-center justify-center gap-2 shadow-lg shadow-primary/20 disabled:opacity-60"
           >
-            {saving ? <><RefreshCw className="w-4 h-4 animate-spin" />Сохранение...</> : <><Save className="w-4 h-4" />{t("params.saveParams")}</>}
+            {saving ? <><RefreshCw className="w-4 h-4 animate-spin" />{t("params.saving")}</> : <><Save className="w-4 h-4" />{t("params.saveParams")}</>}
           </button>
         </div>
       </div>

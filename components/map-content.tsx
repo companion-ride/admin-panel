@@ -77,27 +77,25 @@ export default function MapContent() {
       if (res.ok) {
         const raw = await res.json()
         const list: unknown[] = Array.isArray(raw) ? raw : []
-        if (list.length > 0) {
-          const mapped: ActiveDriver[] = list.map((d: unknown) => {
-            const dr = d as Record<string, unknown>
-            const isOnRide = dr.status === "on_ride" || dr.is_on_ride === true
-            return {
-              id: String(dr.id ?? dr.driver_id ?? ""),
-              name: String(dr.name ?? "—"),
-              status: isOnRide ? "on_ride" as const : "available" as const,
-              lat: Number(dr.lat ?? dr.latitude ?? 43.238),
-              lon: Number(dr.lon ?? dr.longitude ?? 76.945),
-              rating: typeof dr.rating === "number" ? dr.rating : 0,
-              ridesTotal: typeof dr.rides_total === "number" ? dr.rides_total : 0,
-              ridesToday: typeof dr.rides_today === "number" ? dr.rides_today : 0,
-            }
-          })
-          setDrivers(mapped)
-          setBackendDown(false)
-          setLoaded(true)
-          setRefreshing(false)
-          return
-        }
+        const mapped: ActiveDriver[] = list.map((d: unknown) => {
+          const dr = d as Record<string, unknown>
+          const isOnRide = dr.status === "on_ride" || dr.is_on_ride === true
+          return {
+            id: String(dr.id ?? dr.driver_id ?? ""),
+            name: String(dr.name ?? "—"),
+            status: isOnRide ? "on_ride" as const : "available" as const,
+            lat: Number(dr.lat ?? dr.latitude ?? 0),
+            lon: Number(dr.lon ?? dr.longitude ?? 0),
+            rating: typeof dr.rating === "number" ? dr.rating : 0,
+            ridesTotal: typeof dr.rides_total === "number" ? dr.rides_total : 0,
+            ridesToday: typeof dr.rides_today === "number" ? dr.rides_today : 0,
+          }
+        })
+        setDrivers(mapped)
+        setBackendDown(false)
+        setLoaded(true)
+        setRefreshing(false)
+        return
       }
     } catch {
       // fallback

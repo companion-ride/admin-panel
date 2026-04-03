@@ -121,6 +121,13 @@
     "last7months": "Соңғы 7 ай",
     "last12months": "Соңғы 12 ай",
     "recentTickets": "Соңғы тикеттер",
+    "noTickets": "Тикеттер жоқ",
+    "timeAgo": {
+      "now": "жаңа ғана",
+      "minutes": "{n} мин бұрын",
+      "hours": "{n} сағ бұрын",
+      "days": "{n} күн бұрын"
+    },
     "chart": {
       "week": "Апта",
       "month": "Ай",
@@ -430,9 +437,12 @@
   "matching": {
     "title": "Матчинг",
     "subtitle": "Алгоритм және платформа параметрлері",
+    "local": "Жергілікті",
     "stats": {
       "matchRate": "Матчинг пайызы",
       "avgWait": "Орт. күту уақыты",
+      "totalRides": "Барлық сапарлар",
+      "cancellation": "Бас тарту",
       "maxDetour": "Макс. ауытқу",
       "noShow": "Келмеу пайызы"
     },
@@ -446,7 +456,13 @@
       "womenOnly": "«Тек әйелдер» режимі",
       "commission": "Платформа комиссиясы (%)",
       "alpha": "Жеңілдік коэффициенті α",
+      "pickupRadius": "Алу радиусы (м)",
+      "dropoffRadius": "Түсіру радиусы (м)",
+      "maxPassengers": "Макс. жолаушылар",
+      "minDriverDistance": "Мин. жүргізуші қашықтығы (м)",
+      "minEta": "Мин. ETA (секунд)",
       "saveParams": "Параметрлерді сақтау",
+      "saving": "Сақталуда...",
       "saved": "Сақталды!"
     },
     "corridors": {
