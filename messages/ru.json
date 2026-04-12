@@ -66,7 +66,7 @@
       "overview": "Обзор",
       "users": "Пользователи",
       "rides": "Поездки",
-      "finance": "Финансы",
+
       "platform": "Платформа"
     },
     "nav": {
@@ -76,7 +76,7 @@
       "companies": "Компании",
       "rides": "Поездки",
       "matching": "Матчинг",
-      "billing": "Комиссии и оплата",
+
       "support": "Поддержка",
       "settings": "Настройки",
       "admins": "Администраторы"
@@ -198,53 +198,8 @@
       "cancel": "Отменить"
     }
   },
-  "billing": {
-    "title": "Комиссии и оплата",
-    "subtitle": "Ставка комиссии: {rate}%",
-    "stats": {
-      "collected": "Собрано за месяц",
-      "driversPaid": "{count} водителей оплатили",
-      "pending": "Ожидает оплаты",
-      "driversCount": "{count} водителей",
-      "activeDrivers": "Активных водителей",
-      "madeRides": "совершили поездки",
-      "avgCommission": "Средняя комиссия",
-      "perDriver": "на одного водителя"
-    },
-    "model": {
-      "title": "Комиссионная модель Companion",
-      "text": "С каждого водителя ежемесячно списывается {rate}% от общей суммы его заработка за поездки. Срок оплаты — до 10-го числа следующего месяца. При просрочке более 30 дней аккаунт водителя автоматически приостанавливается."
-    },
-    "table": {
-      "title": "Выплаты",
-      "driver": "Водитель",
-      "rides": "Поездки",
-      "earnings": "Заработок",
-      "commission": "Комиссия ({rate}%)",
-      "status": "Статус",
-      "deadline": "Срок"
-    },
-    "filters": { "all": "Все" },
-    "paymentStatus": {
-      "paid": "Оплачено",
-      "pending": "Ожидает",
-      "overdue": "Просрочено"
-    },
-    "drawer": {
-      "currentPeriod": "Текущий период",
-      "ridesCompleted": "Поездок совершено",
-      "totalEarnings": "Общий заработок",
-      "commissionRate": "Ставка комиссии",
-      "toPay": "К оплате",
-      "paymentStatus": "Статус оплаты",
-      "paidOn": "Оплачено {date}",
-      "dueDate": "Срок оплаты: {date}",
-      "overdueFrom": "Просрочено с {date}",
-      "history": "История выплат",
-      "ridesAndEarnings": "{rides} поездок · {earned}",
-      "markPaid": "Отметить как оплачено"
-    }
-  },
+
+
   "rides": {
     "title": "Поездки",
     "subtitle": "Мониторинг всех поездок на платформе",

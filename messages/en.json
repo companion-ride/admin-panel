@@ -66,7 +66,7 @@
       "overview": "Overview",
       "users": "Users",
       "rides": "Rides",
-      "finance": "Finance",
+
       "platform": "Platform"
     },
     "nav": {
@@ -76,7 +76,7 @@
       "companies": "Companies",
       "rides": "Rides",
       "matching": "Matching",
-      "billing": "Commissions & Payments",
+
       "support": "Support",
       "settings": "Settings",
       "admins": "Administrators"
@@ -219,53 +219,8 @@
       "cancel": "Cancel"
     }
   },
-  "billing": {
-    "title": "Commissions & Payments",
-    "subtitle": "Commission rate: {rate}%",
-    "stats": {
-      "collected": "Collected this month",
-      "driversPaid": "{count} drivers paid",
-      "pending": "Pending payment",
-      "driversCount": "{count} drivers",
-      "activeDrivers": "Active drivers",
-      "madeRides": "made rides",
-      "avgCommission": "Avg commission",
-      "perDriver": "per driver"
-    },
-    "model": {
-      "title": "Companion commission model",
-      "text": "Each driver is charged {rate}% of their total ride earnings monthly. Payment is due by the 10th of the following month. Accounts are automatically suspended after 30 days overdue."
-    },
-    "table": {
-      "title": "Payments",
-      "driver": "Driver",
-      "rides": "Rides",
-      "earnings": "Earnings",
-      "commission": "Commission ({rate}%)",
-      "status": "Status",
-      "deadline": "Deadline"
-    },
-    "filters": { "all": "All" },
-    "paymentStatus": {
-      "paid": "Paid",
-      "pending": "Pending",
-      "overdue": "Overdue"
-    },
-    "drawer": {
-      "currentPeriod": "Current period",
-      "ridesCompleted": "Rides completed",
-      "totalEarnings": "Total earnings",
-      "commissionRate": "Commission rate",
-      "toPay": "To pay",
-      "paymentStatus": "Payment status",
-      "paidOn": "Paid on {date}",
-      "dueDate": "Due date: {date}",
-      "overdueFrom": "Overdue since {date}",
-      "history": "Payment history",
-      "ridesAndEarnings": "{rides} rides · {earned}",
-      "markPaid": "Mark as paid"
-    }
-  },
+
+
   "rides": {
     "title": "Rides",
     "subtitle": "Monitor all rides across the platform",

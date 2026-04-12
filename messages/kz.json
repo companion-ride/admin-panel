@@ -66,7 +66,7 @@
       "overview": "Шолу",
       "users": "Пайдаланушылар",
       "rides": "Сапарлар",
-      "finance": "Қаржы",
+
       "platform": "Платформа"
     },
     "nav": {
@@ -76,7 +76,7 @@
       "companies": "Компаниялар",
       "rides": "Сапарлар",
       "matching": "Матчинг",
-      "billing": "Комиссиялар мен төлем",
+
       "support": "Қолдау",
       "settings": "Параметрлер",
       "admins": "Әкімшілер"
@@ -219,53 +219,8 @@
       "cancel": "Болдырмау"
     }
   },
-  "billing": {
-    "title": "Комиссиялар мен төлем",
-    "subtitle": "Комиссия мөлшерлемесі: {rate}%",
-    "stats": {
-      "collected": "Айда жиналды",
-      "driversPaid": "{count} жүргізуші төледі",
-      "pending": "Төлем күтуде",
-      "driversCount": "{count} жүргізуші",
-      "activeDrivers": "Белсенді жүргізушілер",
-      "madeRides": "сапар жасады",
-      "avgCommission": "Орташа комиссия",
-      "perDriver": "бір жүргізушіге"
-    },
-    "model": {
-      "title": "Companion комиссия моделі",
-      "text": "Әр жүргізушіден ай сайын сапар табысының {rate}% ұсталады. Төлем мерзімі — келесі айдың 10-на дейін. 30 күннен астам кешіктірілсе, жүргізушінің аккаунты автоматты түрде тоқтатылады."
-    },
-    "table": {
-      "title": "Төлемдер",
-      "driver": "Жүргізуші",
-      "rides": "Сапарлар",
-      "earnings": "Табыс",
-      "commission": "Комиссия ({rate}%)",
-      "status": "Күй",
-      "deadline": "Мерзім"
-    },
-    "filters": { "all": "Барлығы" },
-    "paymentStatus": {
-      "paid": "Төленді",
-      "pending": "Күтуде",
-      "overdue": "Мерзімі өтті"
-    },
-    "drawer": {
-      "currentPeriod": "Ағымдағы кезең",
-      "ridesCompleted": "Орындалған сапарлар",
-      "totalEarnings": "Жалпы табыс",
-      "commissionRate": "Комиссия мөлшерлемесі",
-      "toPay": "Төлеуге",
-      "paymentStatus": "Төлем күйі",
-      "paidOn": "{date} төленді",
-      "dueDate": "Төлем мерзімі: {date}",
-      "overdueFrom": "{date} бастап кешіктірілді",
-      "history": "Төлем тарихы",
-      "ridesAndEarnings": "{rides} сапар · {earned}",
-      "markPaid": "Төленді деп белгілеу"
-    }
-  },
+
+
   "rides": {
     "title": "Сапарлар",
     "subtitle": "Платформадағы барлық сапарларды бақылау",

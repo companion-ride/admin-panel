@@ -13,7 +13,7 @@ import {
   Settings,
   Shuffle,
   Map,
-  CreditCard,
+
   UserCog,
   PanelLeftClose,
   PanelLeftOpen,
@@ -106,12 +106,7 @@ export function Sidebar() {
         { label: t("nav.matching"), href: "/matching", icon: Shuffle },
       ],
     },
-    {
-      title: t("sections.finance"),
-      items: [
-        { label: t("nav.billing"), href: "/billing", icon: CreditCard },
-      ],
-    },
+
     {
       title: t("sections.platform"),
       items: [
