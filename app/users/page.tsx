@@ -8,6 +8,7 @@ import { Search, RotateCw, User, Car, X, ChevronRight, Inbox, ArrowUpDown, Arrow
 import { SkeletonTable } from "@/components/skeleton"
 import { cn } from "@/lib/utils"
 import { useTranslations } from "next-intl"
+import { backendFetch } from "@/lib/backend-fetch"
 import { useToast } from "@/components/toast"
 import { allUsers } from "@/lib/data"
 import type { AppUser } from "@/lib/data"
@@ -104,7 +105,7 @@ export default function UsersPage() {
       if (search.trim()) params.set("search", search.trim())
       params.set("limit", "100")
 
-      const res = await fetch(`/api/users?${params}`)
+      const res = await backendFetch(`/api/users?${params}`)
       const data: ApiUsersResponse = await res.json()
       if (!res.ok) throw new Error((data as { error?: string }).error ?? `Ошибка ${res.status}`)
       setUsers(data.items ?? [])
@@ -147,7 +148,7 @@ export default function UsersPage() {
     setUsers((prev) => prev.map((u) => u.id === user.id ? { ...u, status: newStatus } : u))
     setSelectedUser((prev) => prev?.id === user.id ? { ...prev, status: newStatus } : prev)
     try {
-      const res = await fetch(`/api/users/${user.id}/status`, {
+      const res = await backendFetch(`/api/users/${user.id}/status`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: newStatus }),

@@ -6,6 +6,7 @@ import { SkeletonDriverCard } from "@/components/skeleton"
 import { cn } from "@/lib/utils"
 import { useTranslations } from "next-intl"
 import { useLocale } from "@/components/locale-provider"
+import { backendFetch } from "@/lib/backend-fetch"
 import Script from "next/script"
 
 type DriverStatus = "on_ride" | "available"
@@ -73,7 +74,7 @@ export default function MapContent() {
   const fetchDrivers = useCallback(async () => {
     setRefreshing(true)
     try {
-      const res = await fetch("/api/drivers/active")
+      const res = await backendFetch("/api/drivers/active")
       if (res.ok) {
         const raw = await res.json()
         const list: unknown[] = Array.isArray(raw) ? raw : []

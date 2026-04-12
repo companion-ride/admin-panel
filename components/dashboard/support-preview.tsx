@@ -4,6 +4,7 @@ import Link from "next/link"
 import { StatusBadge } from "@/components/status-badge"
 import { Clock, Inbox } from "lucide-react"
 import { useTranslations } from "next-intl"
+import { backendFetch } from "@/lib/backend-fetch"
 import { useState, useEffect, useCallback } from "react"
 
 interface Ticket {
@@ -39,7 +40,7 @@ export function SupportPreview() {
 
   const fetchTickets = useCallback(async () => {
     try {
-      const res = await fetch("/api/tickets?limit=5")
+      const res = await backendFetch("/api/tickets?limit=5")
       if (res.ok) {
         const data = await res.json()
         setTickets(data.tickets ?? [])

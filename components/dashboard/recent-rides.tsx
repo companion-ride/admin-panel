@@ -5,6 +5,7 @@ import Link from "next/link"
 import { StatusBadge } from "@/components/status-badge"
 import { ArrowRight, Inbox } from "lucide-react"
 import { useTranslations } from "next-intl"
+import { backendFetch } from "@/lib/backend-fetch"
 
 interface RecentRide {
   id: string
@@ -41,7 +42,7 @@ export function RecentRidesTable() {
     async function load() {
       try {
         // Try /admin/stats first — it has recent_rides with enriched data
-        const statsRes = await fetch("/api/dashboard/stats")
+        const statsRes = await backendFetch("/api/dashboard/stats")
         if (statsRes.ok) {
           const statsData = await statsRes.json()
           const recent = statsData?.recent_rides
@@ -65,7 +66,7 @@ export function RecentRidesTable() {
         }
 
         // Fallback to rides API
-        const res = await fetch("/api/rides?limit=5")
+        const res = await backendFetch("/api/rides?limit=5")
         if (res.ok) {
           const data = await res.json()
           const items = Array.isArray(data) ? data : data?.rides ?? data?.items

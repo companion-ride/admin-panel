@@ -8,6 +8,7 @@ import { RecentRidesTable } from "@/components/dashboard/recent-rides"
 import { RidesChart } from "@/components/dashboard/rides-chart"
 import { SupportPreview } from "@/components/dashboard/support-preview"
 import { Car, Users, MessageSquare, RefreshCw, Inbox } from "lucide-react"
+import { backendFetch } from "@/lib/backend-fetch"
 import { useTranslations } from "next-intl"
 import { useLocale } from "@/components/locale-provider"
 import { SkeletonCard, SkeletonTable } from "@/components/skeleton"
@@ -69,10 +70,10 @@ export default function DashboardPage() {
     try {
       // Fetch stats + real active users count + matching stats in parallel
       const [statsRes, usersCountRes, matchingRes, ridesRes] = await Promise.all([
-        fetch("/api/dashboard/stats"),
-        fetch("/api/users?status=active&limit=1"),
-        fetch("/api/matching/stats"),
-        fetch("/api/rides?status=in_progress&limit=10"),
+        backendFetch("/api/dashboard/stats"),
+        backendFetch("/api/users?status=active&limit=1"),
+        backendFetch("/api/matching/stats"),
+        backendFetch("/api/rides?status=in_progress&limit=10"),
       ])
 
       const data = statsRes.ok ? await statsRes.json().catch(() => null) : null

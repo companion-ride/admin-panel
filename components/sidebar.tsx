@@ -21,6 +21,7 @@ import { cn } from "@/lib/utils"
 import { useTranslations } from "next-intl"
 import { useLocale, type Locale } from "@/components/locale-provider"
 import { useAuth } from "@/components/auth-provider"
+import { backendFetch } from "@/lib/backend-fetch"
 import { useState, useEffect, useCallback } from "react"
 
 const SIDEBAR_KEY = "companion_sidebar_collapsed"
@@ -43,7 +44,7 @@ export function Sidebar() {
 
   const fetchOpenTickets = useCallback(async () => {
     try {
-      const res = await fetch("/api/tickets?status=open&limit=1")
+      const res = await backendFetch("/api/tickets?status=open&limit=1")
       if (res.ok) {
         const data = await res.json()
         setOpenTickets(data.total ?? 0)

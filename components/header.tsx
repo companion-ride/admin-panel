@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation"
 import { useAuth } from "@/components/auth-provider"
 import { useTranslations } from "next-intl"
 import { useLocale } from "@/components/locale-provider"
+import { backendFetch } from "@/lib/backend-fetch"
 
 // ─── Search ───
 
@@ -78,9 +79,9 @@ export function Header() {
     const all: SearchResult[] = []
 
     const [usersRes, ridesRes, adminsRes] = await Promise.allSettled([
-      fetch(`/api/users?search=${encodeURIComponent(q)}&limit=5`),
-      fetch(`/api/rides?search=${encodeURIComponent(q)}&limit=5`),
-      fetch(`/api/users?role=admin&search=${encodeURIComponent(q)}&limit=5`),
+      backendFetch(`/api/users?search=${encodeURIComponent(q)}&limit=5`),
+      backendFetch(`/api/rides?search=${encodeURIComponent(q)}&limit=5`),
+      backendFetch(`/api/users?role=admin&search=${encodeURIComponent(q)}&limit=5`),
     ])
 
     if (usersRes.status === "fulfilled" && usersRes.value.ok) {
@@ -180,9 +181,9 @@ export function Header() {
     try {
       // Fetch from both stats and rides APIs for comprehensive notifications
       const [statsRes, usersRes, ridesRes] = await Promise.allSettled([
-        fetch("/api/dashboard/stats"),
-        fetch("/api/users?limit=5"),
-        fetch("/api/rides?limit=5"),
+        backendFetch("/api/dashboard/stats"),
+        backendFetch("/api/users?limit=5"),
+        backendFetch("/api/rides?limit=5"),
       ])
 
       // Users (if enabled)

@@ -6,6 +6,7 @@ import { StatusBadge } from "@/components/status-badge"
 import { Search, RotateCw, MapPin, Eye, X, Inbox } from "lucide-react"
 import { SkeletonTable } from "@/components/skeleton"
 import { useTranslations } from "next-intl"
+import { backendFetch } from "@/lib/backend-fetch"
 
 function shortName(fullName: string) {
   const parts = fullName.trim().split(" ")
@@ -72,7 +73,7 @@ export default function RidesPage() {
       if (search.trim()) params.set("search", search.trim())
       params.set("limit", "100")
 
-      const res = await fetch(`/api/rides?${params}`)
+      const res = await backendFetch(`/api/rides?${params}`)
       if (res.ok) {
         const data = await res.json()
         const items = Array.isArray(data) ? data : data?.rides ?? data?.items

@@ -6,6 +6,7 @@ import { StatCard } from "@/components/stat-card"
 import { CheckCircle, Clock, Shuffle, AlertTriangle, Save, RefreshCw } from "lucide-react"
 import { useTranslations } from "next-intl"
 import { useToast } from "@/components/toast"
+import { backendFetch } from "@/lib/backend-fetch"
 
 interface MatchingParams {
   dropoffRadiusM: number
@@ -77,7 +78,7 @@ export default function MatchingPage() {
   async function handleSave() {
     setSaving(true)
     try {
-      const res = await fetch("/api/matching/params", {
+      const res = await backendFetch("/api/matching/params", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(params),

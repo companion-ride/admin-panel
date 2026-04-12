@@ -6,6 +6,7 @@ import { useAuth } from "@/components/auth-provider"
 import { useToast } from "@/components/toast"
 import { useTranslations } from "next-intl"
 import { useLocale } from "@/components/locale-provider"
+import { backendFetch } from "@/lib/backend-fetch"
 import {
   ShieldCheck, Shield, Lock, UserPlus, X, Inbox,
 } from "lucide-react"
@@ -48,7 +49,7 @@ export default function AdminsPage() {
   const fetchAdmins = useCallback(async () => {
     setLoading(true)
     try {
-      const res = await fetch("/api/users?role=admin&limit=100")
+      const res = await backendFetch("/api/users?role=admin&limit=100")
       if (res.ok) {
         const data = await res.json()
         setAdmins(data.items ?? [])
@@ -70,7 +71,7 @@ export default function AdminsPage() {
     setFormError("")
     setFormLoading(true)
     try {
-      const res = await fetch("/api/admins/invite", {
+      const res = await backendFetch("/api/admins/invite", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: invite.name, phone: invite.phone }),
@@ -92,7 +93,7 @@ export default function AdminsPage() {
     setFormError("")
     setFormLoading(true)
     try {
-      const res = await fetch("/api/admins/verify", {
+      const res = await backendFetch("/api/admins/verify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ phone: invite.phone, code: otpCode }),

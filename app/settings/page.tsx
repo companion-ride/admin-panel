@@ -7,6 +7,7 @@ import { useTranslations } from "next-intl"
 import { useToast } from "@/components/toast"
 import { useLocale } from "@/components/locale-provider"
 import { cn } from "@/lib/utils"
+import { backendFetch } from "@/lib/backend-fetch"
 
 interface Service {
   id: string
@@ -113,7 +114,7 @@ export default function SettingsPage() {
 
     const results = await Promise.allSettled(
       checks.map(async (ep) => {
-        const res = await fetch(ep.url)
+        const res = await backendFetch(ep.url)
         return { ...ep, ok: res.ok }
       })
     )
@@ -130,8 +131,8 @@ export default function SettingsPage() {
   const fetchServices = useCallback(async () => {
     setServicesLoading(true)
     try {
-      const res = await fetch("/api/config/services")
-      if (res.ok) setServices(Array.isArray(await res.json().then(d => d)) ? await fetch("/api/config/services").then(r => r.json()) : [])
+      const res = await backendFetch("/api/config/services")
+      if (res.ok) setServices(Array.isArray(await res.json().then(d => d)) ? await backendFetch("/api/config/services").then(r => r.json()) : [])
     } catch {} finally { setServicesLoading(false) }
   }, [])
 
@@ -142,7 +143,7 @@ export default function SettingsPage() {
     setConfigLoading(true)
     setConfigTab("config")
     try {
-      const res = await fetch(`/api/config/${service.name}`)
+      const res = await backendFetch(`/api/config/${service.name}`)
       if (res.ok) {
         const data = await res.json()
         setServiceConfig(data)
@@ -157,7 +158,7 @@ export default function SettingsPage() {
     e.preventDefault()
     if (!newServiceName.trim()) return
     try {
-      const res = await fetch("/api/config/services", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: newServiceName.trim() }) })
+      const res = await backendFetch("/api/config/services", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: newServiceName.trim() }) })
       const data = await res.json()
       if (res.ok) { setCreatedApiKey(data.api_key || ""); setNewServiceName(""); fetchServices(); if (!data.api_key) { setNewServiceOpen(false); toast("Сервис создан", "ok") } }
       else toast(data.error || data.detail || "Ошибка", "err")
@@ -169,7 +170,7 @@ export default function SettingsPage() {
     setConfigSaving(true)
     try {
       const parsed = JSON.parse(configJson)
-      const res = await fetch(`/api/config/${selectedService.name}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ config: parsed }) })
+      const res = await backendFetch(`/api/config/${selectedService.name}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ config: parsed }) })
       const data = await res.json()
       if (res.ok) { setServiceConfig(data); toast(locale === "ru" ? "Конфигурация сохранена" : "Config saved", "ok") }
       else toast(data.error || "Error", "err")
@@ -182,7 +183,7 @@ export default function SettingsPage() {
     setConfigSaving(true)
     try {
       const parsed = JSON.parse(schemaJson)
-      const res = await fetch(`/api/config/${selectedService.name}/schema`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ schema: parsed }) })
+      const res = await backendFetch(`/api/config/${selectedService.name}/schema`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ schema: parsed }) })
       if (res.ok) toast(locale === "ru" ? "Схема сохранена" : "Schema saved", "ok")
       else { const data = await res.json(); toast(data.error || "Error", "err") }
     } catch { toast("Invalid JSON", "err") }

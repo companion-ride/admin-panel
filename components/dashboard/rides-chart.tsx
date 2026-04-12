@@ -12,6 +12,7 @@ import {
 } from "recharts"
 import { useTranslations } from "next-intl"
 import { Calendar } from "lucide-react"
+import { backendFetch } from "@/lib/backend-fetch"
 import { DatePicker } from "@/components/date-picker"
 
 interface ChartPoint {
@@ -138,7 +139,7 @@ export function RidesChart() {
       try {
         // For longer periods, try stats API first (has pre-aggregated monthly data)
         if (period === "3months" || period === "year") {
-          const statsRes = await fetch("/api/dashboard/stats")
+          const statsRes = await backendFetch("/api/dashboard/stats")
           if (statsRes.ok) {
             const statsData = await statsRes.json()
             const chart = statsData?.rides_chart
@@ -169,7 +170,7 @@ export function RidesChart() {
         }
 
         // For shorter periods or fallback, fetch individual rides
-        const res = await fetch("/api/rides?limit=100")
+        const res = await backendFetch("/api/rides?limit=100")
         if (res.ok) {
           const json = await res.json()
           const items = Array.isArray(json) ? json : json?.rides ?? json?.items ?? []
