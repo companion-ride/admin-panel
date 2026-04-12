@@ -9,7 +9,7 @@
     "active": true,
     "permissions": {
       "viewAdmins": true,
-      "editAdmins": true,
+      "editAdmins": true, 
       "deleteAdmins": true,
       "inviteAdmins": true,
       "activateAdmins": true
