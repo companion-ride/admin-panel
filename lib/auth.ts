@@ -1,8 +1,10 @@
 import { SignJWT, jwtVerify } from "jose"
 
-const jwtSecret = process.env.JWT_SECRET
-if (!jwtSecret) throw new Error("JWT_SECRET environment variable is not set")
-const secret = new TextEncoder().encode(jwtSecret)
+function getSecret() {
+  const jwtSecret = process.env.JWT_SECRET
+  if (!jwtSecret) throw new Error("JWT_SECRET environment variable is not set")
+  return new TextEncoder().encode(jwtSecret)
+}
 
 export interface AdminTokenPayload {
   id: string
@@ -23,12 +25,12 @@ export async function signToken(payload: AdminTokenPayload): Promise<string> {
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setExpirationTime("7d")
-    .sign(secret)
+    .sign(getSecret())
 }
 
 export async function verifyToken(token: string): Promise<AdminTokenPayload | null> {
   try {
-    const { payload } = await jwtVerify(token, secret)
+    const { payload } = await jwtVerify(token, getSecret())
     return payload as unknown as AdminTokenPayload
   } catch {
     return null

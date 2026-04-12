@@ -3,13 +3,14 @@
 import { useState, useRef, useEffect, useCallback } from "react"
 import { AdminLayout } from "@/components/admin-layout"
 import { StatusBadge } from "@/components/status-badge"
-import { Search, Send, Clock, MessageSquare, Inbox, RefreshCw, ChevronDown } from "lucide-react"
+import { Search, Send, Clock, MessageSquare, Inbox, RefreshCw, ChevronDown, Wifi, WifiOff } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useTranslations } from "next-intl"
 import { useLocale } from "@/components/locale-provider"
 import { useAuth } from "@/components/auth-provider"
 import { useToast } from "@/components/toast"
 import { SkeletonTable } from "@/components/skeleton"
+import { useChatSocket } from "@/hooks/use-chat-socket"
 
 type TicketStatus = "open" | "pending" | "resolved" | "closed"
 
@@ -60,6 +61,8 @@ export default function SupportPage() {
   const [statusDropdownOpen, setStatusDropdownOpen] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const chatContainerRef = useRef<HTMLDivElement>(null)
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const [socketConnected, setSocketConnected] = useState(false)
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   const statusConfig: Record<TicketStatus, { variant: "error" | "warning" | "success" | "neutral" }> = {
@@ -89,7 +92,36 @@ export default function SupportPage() {
     low: { label: t("priority.low"), color: "text-muted-foreground" },
   }
 
-  // Fetch tickets
+  // ── Socket.IO: real-time messages ──
+  const { connected: isSocketConnected } = useChatSocket({
+    roomId: selectedTicket?.room_id ?? null,
+    onMessage: useCallback((msg) => {
+      setMessages(prev => {
+        if (prev.some(m => m.id === msg.message_id)) return prev
+        return [...prev, {
+          id: msg.message_id,
+          room_id: msg.room_id,
+          sender_id: msg.sender_id,
+          content: msg.content,
+          created_at: msg.created_at,
+        }]
+      })
+    }, []),
+    onConnectionChange: useCallback((c: boolean) => setSocketConnected(c), []),
+  })
+
+  // Fallback polling only when socket is disconnected
+  useEffect(() => {
+    if (isSocketConnected || !selectedTicket) {
+      if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null }
+      return
+    }
+    pollRef.current = setInterval(() => pollMessages(selectedTicket.id), 5000)
+    return () => { if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null } }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSocketConnected, selectedTicket?.id])
+
+  // ── Fetch tickets ──
   const fetchTickets = useCallback(async () => {
     setLoading(true)
     try {
@@ -98,18 +130,28 @@ export default function SupportPage() {
       if (searchQuery.trim()) params.set("search", searchQuery.trim())
       params.set("limit", "50")
       const res = await fetch(`/api/tickets?${params}`)
-      if (res.ok) {
-        const data = await res.json()
-        setTickets(data.tickets ?? [])
-        setTotal(data.total ?? 0)
+      if (!res.ok) {
+        if (res.status === 401) toast(tc("sessionExpired") ?? "Session expired", "err")
+        return
       }
-    } catch { /* silent */ }
-    finally { setLoading(false) }
-  }, [filter, searchQuery])
+      const data = await res.json()
+      setTickets(data.tickets ?? [])
+      setTotal(data.total ?? 0)
+    } catch {
+      toast(tc("connectionError"), "err")
+    } finally {
+      setLoading(false)
+    }
+  }, [filter, searchQuery, toast, tc])
 
-  useEffect(() => { fetchTickets() }, [fetchTickets])
+  // Debounce search, immediate on filter change
+  useEffect(() => {
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+    debounceRef.current = setTimeout(() => fetchTickets(), 300)
+    return () => { if (debounceRef.current) clearTimeout(debounceRef.current) }
+  }, [fetchTickets])
 
-  // Fetch ticket detail + messages
+  // ── Open ticket ──
   async function openTicket(ticket: Ticket) {
     setSelectedTicket(ticket)
     setMessages([])
@@ -117,43 +159,38 @@ export default function SupportPage() {
     setMessagesLoading(true)
     try {
       const res = await fetch(`/api/tickets/${ticket.id}`)
-      if (res.ok) {
-        const data = await res.json()
-        const msgs: ChatMessage[] = data.messages?.messages ?? []
-        setMessages(msgs.reverse()) // API returns DESC, we need ASC
-        setNextCursor(data.messages?.next_cursor ?? null)
-        // Update ticket data
-        if (data.ticket) {
-          setSelectedTicket({ ...ticket, ...data.ticket })
-        }
+      if (!res.ok) {
+        if (res.status === 401) toast(tc("sessionExpired") ?? "Session expired", "err")
+        else toast(tc("connectionError"), "err")
+        return
       }
-    } catch { /* silent */ }
-    finally { setMessagesLoading(false) }
-
-    // Start polling for new messages
-    if (pollRef.current) clearInterval(pollRef.current)
-    pollRef.current = setInterval(() => pollMessages(ticket.id), 5000)
+      const data = await res.json()
+      const msgs: ChatMessage[] = data.messages?.messages ?? []
+      setMessages(msgs.reverse()) // API returns DESC, we need ASC
+      setNextCursor(data.messages?.next_cursor ?? null)
+      if (data.ticket) {
+        setSelectedTicket({ ...ticket, ...data.ticket })
+      }
+    } catch {
+      toast(tc("connectionError"), "err")
+    } finally {
+      setMessagesLoading(false)
+    }
   }
 
-  // Poll for new messages
+  // Fallback poll (only used when socket is down)
   async function pollMessages(ticketId: string) {
     try {
       const res = await fetch(`/api/tickets/${ticketId}`)
-      if (res.ok) {
-        const data = await res.json()
-        const msgs: ChatMessage[] = data.messages?.messages ?? []
-        setMessages(msgs.reverse())
-        if (data.ticket?.status) {
-          setSelectedTicket(prev => prev ? { ...prev, status: data.ticket.status } : prev)
-        }
+      if (!res.ok) return
+      const data = await res.json()
+      const msgs: ChatMessage[] = data.messages?.messages ?? []
+      setMessages(msgs.reverse())
+      if (data.ticket?.status) {
+        setSelectedTicket(prev => prev ? { ...prev, status: data.ticket.status } : prev)
       }
-    } catch { /* silent */ }
+    } catch { /* polling failure is non-critical when socket will retry */ }
   }
-
-  // Stop polling on unmount or ticket close
-  useEffect(() => {
-    return () => { if (pollRef.current) clearInterval(pollRef.current) }
-  }, [])
 
   // Scroll to bottom when messages change
   useEffect(() => {
@@ -165,13 +202,12 @@ export default function SupportPage() {
     if (!nextCursor || !selectedTicket) return
     try {
       const res = await fetch(`/api/chat-rooms/${selectedTicket.room_id}/messages?cursor=${nextCursor}&limit=50`)
-      if (res.ok) {
-        const data = await res.json()
-        const older: ChatMessage[] = data.messages ?? []
-        setMessages(prev => [...older.reverse(), ...prev])
-        setNextCursor(data.next_cursor ?? null)
-      }
-    } catch { /* silent */ }
+      if (!res.ok) return
+      const data = await res.json()
+      const older: ChatMessage[] = data.messages ?? []
+      setMessages(prev => [...older.reverse(), ...prev])
+      setNextCursor(data.next_cursor ?? null)
+    } catch { /* silent — user can retry via button */ }
   }
 
   // Send reply
@@ -185,13 +221,15 @@ export default function SupportPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ content: replyText.trim() }),
       })
-      if (res.ok) {
-        const msg = await res.json()
-        setMessages(prev => [...prev, msg])
-        setReplyText("")
-        // Status auto-changes to pending after admin reply
-        setSelectedTicket(prev => prev ? { ...prev, status: "pending" } : prev)
+      if (!res.ok) {
+        toast(res.status === 401 ? (tc("sessionExpired") ?? "Session expired") : tc("connectionError"), "err")
+        return
       }
+      const msg = await res.json()
+      // Only add if socket hasn't already delivered it
+      setMessages(prev => prev.some(m => m.id === msg.id) ? prev : [...prev, msg])
+      setReplyText("")
+      setSelectedTicket(prev => prev ? { ...prev, status: "pending" } : prev)
     } catch {
       toast(tc("connectionError"), "err")
     } finally { setSending(false) }
@@ -207,14 +245,13 @@ export default function SupportPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: newStatus }),
       })
-      if (res.ok) {
-        setSelectedTicket(prev => prev ? { ...prev, status: newStatus } : prev)
-        setTickets(prev => prev.map(t => t.id === selectedTicket.id ? { ...t, status: newStatus } : t))
-        toast(`${statusLabels[newStatus]}`, "ok")
-        if (newStatus === "resolved" || newStatus === "closed") {
-          if (pollRef.current) clearInterval(pollRef.current)
-        }
+      if (!res.ok) {
+        toast(res.status === 401 ? (tc("sessionExpired") ?? "Session expired") : tc("connectionError"), "err")
+        return
       }
+      setSelectedTicket(prev => prev ? { ...prev, status: newStatus } : prev)
+      setTickets(prev => prev.map(t => t.id === selectedTicket.id ? { ...t, status: newStatus } : t))
+      toast(`${statusLabels[newStatus]}`, "ok")
     } catch {
       toast(tc("connectionError"), "err")
     } finally {
@@ -226,7 +263,7 @@ export default function SupportPage() {
   function closeTicketView() {
     setSelectedTicket(null)
     setMessages([])
-    if (pollRef.current) clearInterval(pollRef.current)
+    if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null }
     fetchTickets()
   }
 
@@ -337,6 +374,12 @@ export default function SupportPage() {
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
+                  {/* Socket indicator */}
+                  <div className="flex items-center gap-1 text-[10px] text-muted-foreground" title={socketConnected ? "Real-time" : "Polling"}>
+                    {socketConnected
+                      ? <Wifi className="w-3 h-3 text-success" />
+                      : <WifiOff className="w-3 h-3 text-muted-foreground/50" />}
+                  </div>
                   {/* Status dropdown */}
                   <div className="relative">
                     <button onClick={() => setStatusDropdownOpen(!statusDropdownOpen)}
