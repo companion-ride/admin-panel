@@ -86,7 +86,7 @@ export default function MapContent() {
             name: String(dr.name ?? "—"),
             status: isOnRide ? "on_ride" as const : "available" as const,
             lat: Number(dr.lat ?? dr.latitude ?? 0),
-            lon: Number(dr.lon ?? dr.longitude ?? 0),
+            lon: Number(dr.lon ?? dr.lng ?? dr.longitude ?? 0),
             rating: typeof dr.rating === "number" ? dr.rating : 0,
             ridesTotal: typeof dr.rides_total === "number" ? dr.rides_total : 0,
             ridesToday: typeof dr.rides_today === "number" ? dr.rides_today : 0,
