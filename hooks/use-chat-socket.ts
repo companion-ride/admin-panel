@@ -3,7 +3,16 @@
 import { useEffect, useRef, useCallback, useState } from "react"
 import { io, Socket } from "socket.io-client"
 
-const SOCKET_URL = process.env.NEXT_PUBLIC_API_URL?.replace(/\/api\/auth\/?$/, "") || ""
+// Extract origin from NEXT_PUBLIC_API_URL regardless of its path
+// e.g. "https://companion.kopir.uk/api/auth" → "https://companion.kopir.uk"
+// e.g. "https://companion.kopir.uk"          → "https://companion.kopir.uk"
+const SOCKET_URL = (() => {
+  try {
+    return new URL(process.env.NEXT_PUBLIC_API_URL || "").origin
+  } catch {
+    return ""
+  }
+})()
 const SOCKET_PATH = "/api/ws/socket.io/"
 
 interface ChatMessage {
@@ -42,7 +51,13 @@ export function useChatSocket({ roomId, onMessage, onConnectionChange }: UseChat
     // Fetch backend token via protected API route
     let token: string
     try {
-      const res = await fetch("/api/auth/socket-token")
+      let res = await fetch("/api/auth/socket-token")
+      // If token expired, try refreshing once
+      if (res.status === 401) {
+        const refreshRes = await fetch("/api/auth/refresh", { method: "POST" })
+        if (!refreshRes.ok) return
+        res = await fetch("/api/auth/socket-token")
+      }
       if (!res.ok) return
       const data = await res.json()
       token = data.token
@@ -96,6 +111,14 @@ export function useChatSocket({ roomId, onMessage, onConnectionChange }: UseChat
     connect()
     return () => disconnect()
   }, [connect, disconnect])
+
+  // When roomId changes, emit chat_history to join the socket.io room server-side.
+  // This ensures the admin receives chat_new_message broadcasts for this room.
+  useEffect(() => {
+    const socket = socketRef.current
+    if (!socket?.connected || !roomId) return
+    socket.emit("chat_history", { room_id: roomId, limit: 1 })
+  }, [roomId, connected])
 
   return { connected, disconnect }
 }

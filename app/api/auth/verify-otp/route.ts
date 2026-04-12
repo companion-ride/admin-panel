@@ -64,6 +64,18 @@ export async function POST(request: NextRequest) {
       })
     }
 
+    // Save refresh token for automatic token renewal
+    const refreshToken: string = data.refresh_token ?? ""
+    if (refreshToken) {
+      response.cookies.set("backend_refresh_token", refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 60 * 60 * 24 * 7,
+        path: "/",
+      })
+    }
+
     return response
   } catch {
     return NextResponse.json({ error: "Ошибка сервера" }, { status: 500 })

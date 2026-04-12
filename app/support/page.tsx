@@ -11,6 +11,7 @@ import { useAuth } from "@/components/auth-provider"
 import { useToast } from "@/components/toast"
 import { SkeletonTable } from "@/components/skeleton"
 import { useChatSocket } from "@/hooks/use-chat-socket"
+import { backendFetch } from "@/lib/backend-fetch"
 
 type TicketStatus = "open" | "pending" | "resolved" | "closed"
 
@@ -129,7 +130,7 @@ export default function SupportPage() {
       if (filter !== "all") params.set("status", filter)
       if (searchQuery.trim()) params.set("search", searchQuery.trim())
       params.set("limit", "50")
-      const res = await fetch(`/api/tickets?${params}`)
+      const res = await backendFetch(`/api/tickets?${params}`)
       if (!res.ok) {
         if (res.status === 401) toast(tc("sessionExpired") ?? "Session expired", "err")
         return
@@ -158,7 +159,7 @@ export default function SupportPage() {
     setNextCursor(null)
     setMessagesLoading(true)
     try {
-      const res = await fetch(`/api/tickets/${ticket.id}`)
+      const res = await backendFetch(`/api/tickets/${ticket.id}`)
       if (!res.ok) {
         if (res.status === 401) toast(tc("sessionExpired") ?? "Session expired", "err")
         else toast(tc("connectionError"), "err")
@@ -181,7 +182,7 @@ export default function SupportPage() {
   // Fallback poll (only used when socket is down)
   async function pollMessages(ticketId: string) {
     try {
-      const res = await fetch(`/api/tickets/${ticketId}`)
+      const res = await backendFetch(`/api/tickets/${ticketId}`)
       if (!res.ok) return
       const data = await res.json()
       const msgs: ChatMessage[] = data.messages?.messages ?? []
@@ -201,7 +202,7 @@ export default function SupportPage() {
   async function loadMore() {
     if (!nextCursor || !selectedTicket) return
     try {
-      const res = await fetch(`/api/chat-rooms/${selectedTicket.room_id}/messages?cursor=${nextCursor}&limit=50`)
+      const res = await backendFetch(`/api/chat-rooms/${selectedTicket.room_id}/messages?cursor=${nextCursor}&limit=50`)
       if (!res.ok) return
       const data = await res.json()
       const older: ChatMessage[] = data.messages ?? []
@@ -216,7 +217,7 @@ export default function SupportPage() {
     if (!replyText.trim() || !selectedTicket || sending) return
     setSending(true)
     try {
-      const res = await fetch(`/api/tickets/${selectedTicket.id}/messages`, {
+      const res = await backendFetch(`/api/tickets/${selectedTicket.id}/messages`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ content: replyText.trim() }),
@@ -240,7 +241,7 @@ export default function SupportPage() {
     if (!selectedTicket) return
     setStatusChanging(true)
     try {
-      const res = await fetch(`/api/tickets/${selectedTicket.id}/status`, {
+      const res = await backendFetch(`/api/tickets/${selectedTicket.id}/status`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: newStatus }),
