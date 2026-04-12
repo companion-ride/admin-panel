@@ -12,8 +12,7 @@ export interface AppUser {
   type: UserType
   status: UserStatus
   plan: PlanTier
-  companyId?: string
-  companyName?: string
+
   rides: number
   rating: number
   joinedDate: string
@@ -24,45 +23,6 @@ export interface AppUser {
   licensePlate?: string
 }
 
-// ─── Companies ────────────────────────────────────────────────────────────────
-
-export type CompanyStatus = "active" | "trial" | "suspended"
-
-export interface Company {
-  id: string
-  name: string
-  initials: string
-  ownerName: string
-  ownerEmail: string
-  userCount: number
-  status: CompanyStatus
-  plan: PlanTier
-  mrr: number
-  joinedDate: string
-}
-
-// ─── Billing ──────────────────────────────────────────────────────────────────
-
-export interface BillingPlan {
-  id: string
-  name: string
-  price: number
-  maxUsers: number | "unlimited"
-  apiCallsLimit: number | "unlimited"
-  features: string[]
-  popular?: boolean
-}
-
-export type PaymentStatus = "paid" | "failed" | "refunded" | "pending"
-
-export interface Payment {
-  id: string
-  date: string
-  description: string
-  transactionId: string
-  amount: number
-  status: PaymentStatus
-}
 
 // ─── Rides ────────────────────────────────────────────────────────────────────
 

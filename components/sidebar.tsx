@@ -6,7 +6,6 @@ import { usePathname, useRouter } from "next/navigation"
 import {
   LayoutDashboard,
   Users,
-  Building2,
   Car,
   MessageSquare,
   LogOut,
@@ -96,7 +95,6 @@ export function Sidebar() {
       title: t("sections.users"),
       items: [
         { label: t("nav.users"), href: "/users", icon: Users },
-        { label: t("nav.companies"), href: "/companies", icon: Building2 },
       ],
     },
     {

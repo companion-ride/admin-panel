@@ -48,7 +48,7 @@ export default function DashboardPage() {
   const [initialLoading, setInitialLoading] = useState(true)
   const [stats, setStats] = useState<DashboardStats>(FALLBACK_STATS)
   const [activeRides, setActiveRides] = useState<ActiveRide[]>(FALLBACK_RIDES)
-  const [isLive, setIsLive] = useState(false)
+
   const [backendDown, setBackendDown] = useState(false)
 
   const localeCode = locale === "kz" ? "kk-KZ" : locale === "ru" ? "ru-RU" : "en-US"
@@ -108,7 +108,7 @@ export default function DashboardPage() {
             })))
           }
 
-          setIsLive(true)
+
           setBackendDown(false)
           setInitialLoading(false)
           setRefreshing(false)
@@ -148,12 +148,7 @@ export default function DashboardPage() {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          {isLive && (
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-error/10 border border-error/20 text-xs font-bold text-error">
-              <span className="w-1.5 h-1.5 rounded-full bg-error animate-pulse" />
-              {t("live")}
-            </div>
-          )}
+
           <button
             onClick={fetchData}
             disabled={refreshing}
@@ -188,12 +183,8 @@ export default function DashboardPage() {
       <div className="bg-card rounded-2xl border border-border shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] mb-8">
         <div className="flex items-center justify-between p-6 pb-4">
           <h4 className="text-base font-bold text-foreground">{t("activeRides")} ({activeRides.length})</h4>
-          {isLive && (
-            <div className="flex items-center gap-2 text-[10px] font-bold text-error bg-error/10 px-2.5 py-1 rounded-full">
-              <span className="w-1.5 h-1.5 rounded-full bg-error animate-pulse" />
-              {t("live")}
-            </div>
-          )}
+
+
         </div>
         {initialLoading ? (
           <div className="overflow-x-auto"><table className="w-full"><SkeletonTable rows={3} cols={7} /></table></div>

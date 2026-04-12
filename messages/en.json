@@ -73,7 +73,6 @@
       "overview": "Overview",
       "map": "Map",
       "users": "Users",
-      "companies": "Companies",
       "rides": "Rides",
       "matching": "Matching",
 
@@ -91,7 +90,7 @@
     "checkingApi": "Checking API…",
     "apiOnline": "API Online",
     "apiOffline": "API Offline",
-    "live": "LIVE",
+
     "refresh": "Refresh",
     "export": "Export",
     "stats": {
@@ -187,36 +186,6 @@
       "suspendUser": "Suspend",
       "activateUser": "Activate",
       "viewRides": "Rides"
-    }
-  },
-  "companies": {
-    "title": "Companies",
-    "subtitle": "{count} organizations · MRR",
-    "addCompany": "Add Company",
-    "filters": {
-      "all": "All",
-      "active": "Active",
-      "trial": "Trial"
-    },
-    "searchPlaceholder": "Search by name or owner...",
-    "table": {
-      "company": "Company",
-      "owner": "Owner",
-      "users": "Users",
-      "status": "Status",
-      "plan": "Plan",
-      "mrr": "MRR",
-      "joined": "Joined"
-    },
-    "noCompanies": "No companies found",
-    "showing": "Showing",
-    "of": "of",
-    "companies": "companies",
-    "bulk": {
-      "selected": "{count} selected",
-      "suspend": "Suspend",
-      "changePlan": "Change Plan",
-      "cancel": "Cancel"
     }
   },
 

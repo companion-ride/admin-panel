@@ -73,7 +73,6 @@
       "overview": "Шолу",
       "map": "Карта",
       "users": "Пайдаланушылар",
-      "companies": "Компаниялар",
       "rides": "Сапарлар",
       "matching": "Матчинг",
 
@@ -91,7 +90,7 @@
     "checkingApi": "API тексерілуде…",
     "apiOnline": "API жұмыс істейді",
     "apiOffline": "API қолжетімсіз",
-    "live": "ТІКЕЛЕЙ",
+
     "refresh": "Жаңарту",
     "export": "Экспорт",
     "stats": {
@@ -187,36 +186,6 @@
       "suspendUser": "Бұғаттау",
       "activateUser": "Белсендіру",
       "viewRides": "Сапарлар"
-    }
-  },
-  "companies": {
-    "title": "Компаниялар",
-    "subtitle": "{count} ұйым · MRR",
-    "addCompany": "Компания қосу",
-    "filters": {
-      "all": "Барлығы",
-      "active": "Белсенді",
-      "trial": "Сынақтық"
-    },
-    "searchPlaceholder": "Атауы немесе иесі бойынша іздеу...",
-    "table": {
-      "company": "Компания",
-      "owner": "Иесі",
-      "users": "Пайдаланушылар",
-      "status": "Күй",
-      "plan": "Тариф",
-      "mrr": "MRR",
-      "joined": "Күні"
-    },
-    "noCompanies": "Компаниялар табылмады",
-    "showing": "Көрсетілген",
-    "of": "/",
-    "companies": "компания",
-    "bulk": {
-      "selected": "{count} таңдалды",
-      "suspend": "Бұғаттау",
-      "changePlan": "Тарифті өзгерту",
-      "cancel": "Болдырмау"
     }
   },
 

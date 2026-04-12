@@ -9,8 +9,7 @@ export const allUsers: AppUser[] = [
     type: "passenger",
     status: "active",
     plan: "professional",
-    companyId: "C-001",
-    companyName: "Almaty Tech",
+
     rides: 42,
     rating: 4.8,
     joinedDate: "15 Jan 2025",
@@ -41,8 +40,7 @@ export const allUsers: AppUser[] = [
     type: "passenger",
     status: "active",
     plan: "enterprise",
-    companyId: "C-002",
-    companyName: "Astana Corp",
+
     rides: 15,
     rating: 5.0,
     joinedDate: "20 Jan 2025",
@@ -103,8 +101,7 @@ export const allUsers: AppUser[] = [
     type: "passenger",
     status: "active",
     plan: "professional",
-    companyId: "C-003",
-    companyName: "KazTech",
+
     rides: 89,
     rating: 4.6,
     joinedDate: "5 Sep 2024",

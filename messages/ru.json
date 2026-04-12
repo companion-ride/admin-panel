@@ -73,7 +73,6 @@
       "overview": "Обзор",
       "map": "Карта",
       "users": "Пользователи",
-      "companies": "Компании",
       "rides": "Поездки",
       "matching": "Матчинг",
 
@@ -91,7 +90,7 @@
     "checkingApi": "Проверка API…",
     "apiOnline": "API онлайн",
     "apiOffline": "API недоступен",
-    "live": "ПРЯМОЙ ЭФИР",
+
     "refresh": "Обновить",
     "export": "Экспорт",
     "stats": {
@@ -166,36 +165,6 @@
       "suspendUser": "Заблокировать",
       "activateUser": "Активировать",
       "viewRides": "Поездки"
-    }
-  },
-  "companies": {
-    "title": "Компании",
-    "subtitle": "{count} организаций · MRR",
-    "addCompany": "Добавить компанию",
-    "filters": {
-      "all": "Все",
-      "active": "Активные",
-      "trial": "Пробные"
-    },
-    "searchPlaceholder": "Поиск по названию или владельцу...",
-    "table": {
-      "company": "Компания",
-      "owner": "Владелец",
-      "users": "Пользователи",
-      "status": "Статус",
-      "plan": "Тариф",
-      "mrr": "MRR",
-      "joined": "Дата"
-    },
-    "noCompanies": "Компании не найдены",
-    "showing": "Показано",
-    "of": "из",
-    "companies": "компаний",
-    "bulk": {
-      "selected": "Выбрано {count}",
-      "suspend": "Заблокировать",
-      "changePlan": "Изменить тариф",
-      "cancel": "Отменить"
     }
   },
 
