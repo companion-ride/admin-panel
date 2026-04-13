@@ -314,32 +314,12 @@
     "saveChanges": "Save Changes",
     "saved": "Saved!",
     "api": {
-      "title": "API Configuration",
-      "subtitle": "Backend endpoints and third-party keys",
-      "baseUrl": "API Base URL",
-      "gisKey": "2GIS API Key",
-      "whatsappToken": "WhatsApp Token (OTP)"
-    },
-    "params": {
-      "title": "App Parameters",
-      "subtitle": "Pricing, matching and platform settings",
-      "commission": "Platform Commission (%)",
-      "alpha": "Discount Coefficient α",
-      "gracePeriod": "Grace Period (min)",
-      "matchRadius": "Matching Radius (m)",
-      "womenOnly": "Women-Only Mode"
+      "title": "API Monitoring",
+      "subtitle": "Backend services connection status"
     },
     "notifications": {
       "title": "Notifications",
-      "subtitle": "Manage notification preferences",
-      "supportAlerts": "New support ticket alerts",
-      "cancellationAlerts": "Ride cancellation alerts",
-      "downtimeAlerts": "System downtime alerts"
-    },
-    "security": {
-      "title": "Security",
-      "subtitle": "Admin panel access settings",
-      "password": "Admin Password"
+      "subtitle": "Manage notification preferences"
     }
   },
   "map": {

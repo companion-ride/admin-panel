@@ -103,25 +103,19 @@ export default function SettingsPage() {
   // Check API health
   async function checkEndpoints() {
     setChecking(true)
-    const checks: EndpointStatus[] = [
-      { name: "Auth API", url: "/api/auth/me", ok: null },
-      { name: "Users API", url: "/api/users?limit=1", ok: null },
-      { name: "Rides API", url: "/api/rides?limit=1", ok: null },
-      { name: "Matching API", url: "/api/matching/stats", ok: null },
-      { name: "Drivers API", url: "/api/drivers/active", ok: null },
-      { name: "Map Config", url: "/api/map-config", ok: null },
-    ]
-
-    const results = await Promise.allSettled(
-      checks.map(async (ep) => {
-        const res = await backendFetch(ep.url)
-        return { ...ep, ok: res.ok }
-      })
-    )
-
-    setEndpoints(results.map((r, i) =>
-      r.status === "fulfilled" ? r.value : { ...checks[i], ok: false }
-    ))
+    try {
+      const res = await backendFetch("/api/health")
+      if (res.ok) {
+        const data = await res.json()
+        setEndpoints(data.map((s: { name: string; ok: boolean }) => ({
+          name: s.name,
+          url: "/health",
+          ok: s.ok,
+        })))
+      }
+    } catch {
+      // leave endpoints empty on failure
+    }
     setChecking(false)
   }
 

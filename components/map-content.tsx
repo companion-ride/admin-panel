@@ -155,7 +155,9 @@ export default function MapContent() {
   useEffect(() => {
     return () => {
       for (const m of markersRef.current) m.destroy()
+      markersRef.current = []
       if (mapRef.current) mapRef.current.destroy()
+      mapRef.current = null
     }
   }, [])
 
@@ -173,7 +175,7 @@ export default function MapContent() {
 
   return (
     <>
-      <Script src="https://mapgl.2gis.com/api/js/v1" strategy="beforeInteractive" />
+      <Script src="https://mapgl.2gis.com/api/js/v1" strategy="afterInteractive" />
 
       <div className="mb-6 flex items-end justify-between">
         <div>
