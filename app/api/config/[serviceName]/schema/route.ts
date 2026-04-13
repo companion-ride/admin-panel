@@ -12,6 +12,24 @@ async function getAuth(request: NextRequest) {
   return verifyToken(token)
 }
 
+// GET /api/config/[serviceName]/schema → GET /admin/schema/{service_name}
+export async function GET(request: NextRequest, { params }: { params: Promise<{ serviceName: string }> }) {
+  const auth = await getAuth(request)
+  if (!auth) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+
+  const { serviceName } = await params
+
+  const res = await fetch(`${CONFIG_URL}/admin/schema/${serviceName}`, {
+    headers: {
+      Authorization: `Bearer ${getBackendToken(request)}`,
+      "ngrok-skip-browser-warning": "true",
+    },
+  })
+
+  const data = await res.json().catch(() => null)
+  return NextResponse.json(data, { status: res.status })
+}
+
 // POST /api/config/[serviceName]/schema → POST /admin/schema/{service_name}
 export async function POST(request: NextRequest, { params }: { params: Promise<{ serviceName: string }> }) {
   const auth = await getAuth(request)

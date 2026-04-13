@@ -137,15 +137,22 @@ export default function SettingsPage() {
     setConfigLoading(true)
     setConfigTab("config")
     try {
-      const res = await backendFetch(`/api/config/${service.name}`)
-      if (res.ok) {
-        const data = await res.json()
+      const [configRes, schemaRes] = await Promise.all([
+        backendFetch(`/api/config/${service.name}`),
+        backendFetch(`/api/config/${service.name}/schema`),
+      ])
+      if (configRes.ok) {
+        const data = await configRes.json()
         setServiceConfig(data)
         setConfigJson(JSON.stringify(data.config ?? {}, null, 2))
       } else { setServiceConfig(null); setConfigJson("{}") }
-    } catch { setServiceConfig(null); setConfigJson("{}") }
+      if (schemaRes.ok) {
+        const schemaData = await schemaRes.json()
+        const schema = schemaData?.schema ?? {}
+        setSchemaJson(Object.keys(schema).length > 0 ? JSON.stringify(schema, null, 2) : "")
+      } else { setSchemaJson("") }
+    } catch { setServiceConfig(null); setConfigJson("{}"); setSchemaJson("") }
     finally { setConfigLoading(false) }
-    setSchemaJson("")
   }
 
   async function handleCreateService(e: React.FormEvent) {
