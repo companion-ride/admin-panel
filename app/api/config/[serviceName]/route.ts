@@ -12,14 +12,14 @@ async function getAuth(request: NextRequest) {
   return verifyToken(token)
 }
 
-// GET /api/config/[serviceName] → GET /service/{service_name}
+// GET /api/config/[serviceName] → GET /admin/config/{service_name}
 export async function GET(request: NextRequest, { params }: { params: Promise<{ serviceName: string }> }) {
   const auth = await getAuth(request)
   if (!auth) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const { serviceName } = await params
 
-  const res = await fetch(`${CONFIG_URL}/service/${serviceName}`, {
+  const res = await fetch(`${CONFIG_URL}/admin/config/${serviceName}`, {
     headers: {
       Authorization: `Bearer ${getBackendToken(request)}`,
       "ngrok-skip-browser-warning": "true",
