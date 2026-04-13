@@ -3,7 +3,7 @@
 import { Bell, Search, Users, Car, ShieldCheck, X, Loader2, UserPlus, AlertTriangle, CheckCircle } from "lucide-react"
 import { useState, useEffect, useRef, useCallback } from "react"
 import { useRouter } from "next/navigation"
-import { useAuth } from "@/components/auth-provider"
+
 import { useTranslations } from "next-intl"
 import { useLocale } from "@/components/locale-provider"
 import { backendFetch } from "@/lib/backend-fetch"
@@ -46,19 +46,12 @@ export function Header() {
   const [notifOpen, setNotifOpen] = useState(false)
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [notifLoading, setNotifLoading] = useState(false)
-  const { admin } = useAuth()
-  const t = useTranslations("sidebar")
   const tc = useTranslations("common")
   const { locale } = useLocale()
-  const localeCode = locale === "kz" ? "kk-KZ" : locale === "ru" ? "ru-RU" : "en-US"
   const router = useRouter()
   const searchRef = useRef<HTMLDivElement>(null)
   const notifRef = useRef<HTMLDivElement>(null)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-
-  const initials = admin?.name ? admin.name.charAt(0).toUpperCase() : "A"
-  const displayName = admin?.name || t("admin")
-  const displayRole = admin?.role === "super" ? t("superAdmin") : t("admin")
 
   // Close dropdowns on outside click
   useEffect(() => {
@@ -477,16 +470,8 @@ export function Header() {
 
         <div className="h-6 w-px bg-border" />
 
-        {/* Profile */}
-        <button className="flex items-center gap-3 pl-2 pr-1 py-1 rounded-full hover:bg-muted transition-all">
-          <div className="text-right">
-            <p className="text-[13px] font-bold leading-none mb-1 text-foreground">{displayName}</p>
-            <p className="text-[11px] text-muted-foreground font-medium leading-none">{displayRole}</p>
-          </div>
-          <div className="w-8 h-8 rounded-full bg-primary/10 border-2 border-card shadow-sm overflow-hidden flex items-center justify-center">
-            <span className="text-xs font-bold text-primary">{initials}</span>
-          </div>
-        </button>
+
+
       </div>
     </header>
   )
