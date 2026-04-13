@@ -121,6 +121,9 @@ export default function MapContent() {
 
     function tryInit() {
       if (!window.mapgl || !containerRef.current) return false
+      // Wait until the container has real dimensions (avoids gray map on SPA navigation)
+      const { offsetWidth, offsetHeight } = containerRef.current
+      if (!offsetWidth || !offsetHeight) return false
       try {
         mapRef.current = new window.mapgl.Map(containerRef.current, { center: ALMATY_CENTER, zoom: 13, key: mapKey })
         setMapReady(true)
@@ -128,11 +131,11 @@ export default function MapContent() {
       } catch { return false }
     }
 
-    // Try immediately, then retry every 500ms until script loads
+    // Try immediately, then retry every 200ms until script loads and container is sized
     if (tryInit()) return
     const interval = setInterval(() => {
       if (tryInit()) clearInterval(interval)
-    }, 500)
+    }, 200)
     return () => clearInterval(interval)
   }, [mapKey])
 
