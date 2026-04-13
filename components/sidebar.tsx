@@ -89,7 +89,7 @@ export function Sidebar() {
       title: t("sections.overview"),
       items: [
         { label: t("nav.overview"), href: "/", icon: LayoutDashboard },
-        { label: t("nav.map"), href: "/map", icon: Map, badge: "3", badgeColor: "bg-error text-primary-foreground" },
+        { label: t("nav.map"), href: "/map", icon: Map },
       ],
     },
     {
