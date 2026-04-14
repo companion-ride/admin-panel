@@ -21,7 +21,6 @@ export async function POST(request: NextRequest) {
   }
 
   const response = NextResponse.json({ ok: true })
-  response.cookies.delete("admin_token")
   response.cookies.delete("backend_token")
   response.cookies.delete("backend_refresh_token")
   return response

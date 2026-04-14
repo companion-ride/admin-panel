@@ -15,19 +15,29 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
-  const token = request.cookies.get("admin_token")?.value
+  const token = request.cookies.get("backend_token")?.value
 
   if (!token) {
     return NextResponse.redirect(new URL("/login", request.url))
   }
 
   try {
-    await jwtVerify(token, JWT_SECRET)
+    const { payload } = await jwtVerify(token, JWT_SECRET)
+    // Ensure user has admin role
+    if (payload.role !== "admin") {
+      return NextResponse.redirect(new URL("/login", request.url))
+    }
     return NextResponse.next()
   } catch {
-    const response = NextResponse.redirect(new URL("/login", request.url))
-    response.cookies.delete("admin_token")
-    return response
+    // Token expired or invalid — try refresh
+    const refreshToken = request.cookies.get("backend_refresh_token")?.value
+    if (!refreshToken) {
+      const response = NextResponse.redirect(new URL("/login", request.url))
+      response.cookies.delete("backend_token")
+      return response
+    }
+    // Let the page load — backendFetch will handle refresh on API calls
+    return NextResponse.next()
   }
 }
 

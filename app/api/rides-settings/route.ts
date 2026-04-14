@@ -13,7 +13,7 @@ function getHeaders(request: NextRequest) {
 
 // GET /api/rides-settings → GET /api/rides/admin/settings
 export async function GET(request: NextRequest) {
-  const token = request.cookies.get("admin_token")?.value
+  const token = request.cookies.get("backend_token")?.value
   if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   const auth = await verifyToken(token)
   if (!auth) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
 
 // PUT /api/rides-settings → PUT /api/rides/admin/settings
 export async function PUT(request: NextRequest) {
-  const token = request.cookies.get("admin_token")?.value
+  const token = request.cookies.get("backend_token")?.value
   if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   const auth = await verifyToken(token)
   if (!auth) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })

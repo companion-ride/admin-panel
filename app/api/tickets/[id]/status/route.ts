@@ -4,7 +4,7 @@ import { CHAT_URL } from "@/lib/api"
 
 // PATCH /api/tickets/[id]/status → PATCH /api/chat/admin/tickets/{id}/status
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const token = request.cookies.get("admin_token")?.value
+  const token = request.cookies.get("backend_token")?.value
   if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   const auth = await verifyToken(token)
   if (!auth) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })

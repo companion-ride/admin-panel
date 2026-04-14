@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
 import { API_BASE_URL } from "@/lib/api"
-import { signToken } from "@/lib/auth"
-import { findAdminByPhone, getAdmins } from "@/lib/admins"
 
 export async function POST(request: NextRequest) {
   try {
@@ -19,33 +17,16 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: data.detail?.[0]?.msg ?? "Неверный код" }, { status: res.status })
     }
 
-    // Бэкенд может вернуть token и/или данные admin-а
-    const backendToken: string = data.access_token ?? data.token ?? ""
-    const adminData = data.admin ?? data.user ?? {}
+    const accessToken: string = data.access_token ?? data.token ?? ""
+    const refreshToken: string = data.refresh_token ?? ""
 
-    // Ищем админа в локальной базе: сначала по полю phone, потом по login
-    const localAdmin =
-      await findAdminByPhone(phone) ??
-      await findAdminByPhone(String(adminData.phone ?? "")) ??
-      (await getAdmins()).find((a) => a.login === phone)
-
-    // Проверяем что аккаунт активен
-    if (localAdmin && !localAdmin.active) {
-      return NextResponse.json({ error: "Аккаунт деактивирован" }, { status: 403 })
+    if (!accessToken) {
+      return NextResponse.json({ error: "Токен не получен" }, { status: 500 })
     }
-
-    // Создаём локальный JWT чтобы middleware и AuthProvider работали как раньше
-    const localToken = await signToken({
-      id: String(localAdmin?.id ?? adminData.id ?? phone),
-      name: String(localAdmin?.name ?? adminData.name ?? phone),
-      login: String(localAdmin?.login ?? adminData.phone ?? phone),
-      role: localAdmin?.role ?? (adminData.role === "super" ? "super" : "admin"),
-      permissions: localAdmin?.permissions,
-    })
 
     const response = NextResponse.json({ ok: true })
 
-    response.cookies.set("admin_token", localToken, {
+    response.cookies.set("backend_token", accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
@@ -53,19 +34,6 @@ export async function POST(request: NextRequest) {
       path: "/",
     })
 
-    // Также сохраняем backend token для API-запросов
-    if (backendToken) {
-      response.cookies.set("backend_token", backendToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        maxAge: 60 * 60 * 24 * 7,
-        path: "/",
-      })
-    }
-
-    // Save refresh token for automatic token renewal
-    const refreshToken: string = data.refresh_token ?? ""
     if (refreshToken) {
       response.cookies.set("backend_refresh_token", refreshToken, {
         httpOnly: true,

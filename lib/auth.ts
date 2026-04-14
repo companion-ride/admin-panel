@@ -1,4 +1,4 @@
-import { SignJWT, jwtVerify } from "jose"
+import { jwtVerify } from "jose"
 
 function getSecret() {
   const jwtSecret = process.env.JWT_SECRET
@@ -7,30 +7,16 @@ function getSecret() {
 }
 
 export interface AdminTokenPayload {
-  id: string
-  name: string
-  login: string
-  role: "super" | "admin"
-  permissions?: {
-    viewAdmins: boolean
-    editAdmins: boolean
-    deleteAdmins: boolean
-    inviteAdmins: boolean
-    activateAdmins: boolean
-  }
+  sub: string
+  role: string
+  type: string
 }
 
-export async function signToken(payload: AdminTokenPayload): Promise<string> {
-  return new SignJWT({ ...payload })
-    .setProtectedHeader({ alg: "HS256" })
-    .setIssuedAt()
-    .setExpirationTime("7d")
-    .sign(getSecret())
-}
-
-export async function verifyToken(token: string): Promise<AdminTokenPayload | null> {
+export async function verifyToken(token: string | undefined): Promise<AdminTokenPayload | null> {
+  if (!token) return null
   try {
     const { payload } = await jwtVerify(token, getSecret())
+    if (payload.type !== "access") return null
     return payload as unknown as AdminTokenPayload
   } catch {
     return null

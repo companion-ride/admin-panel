@@ -2,20 +2,12 @@
 
 import { createContext, useContext, useEffect, useState, useCallback } from "react"
 
-interface AdminPermissions {
-  viewAdmins: boolean
-  editAdmins: boolean
-  deleteAdmins: boolean
-  inviteAdmins: boolean
-  activateAdmins: boolean
-}
-
 interface AuthAdmin {
   id: string
   name: string
-  login: string
-  role: "super" | "admin"
-  permissions?: AdminPermissions
+  phone?: string
+  role: string
+  roles?: string[]
 }
 
 interface AuthContextValue {

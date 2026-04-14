@@ -111,16 +111,14 @@ export function Sidebar() {
       items: [
         { label: t("nav.support"), href: "/support", icon: MessageSquare, ...(openTickets > 0 ? { badge: String(openTickets), badgeColor: "bg-error text-primary-foreground" } : {}) },
         { label: t("nav.settings"), href: "/settings", icon: Settings },
-        ...(admin?.role === "super" || admin?.permissions?.viewAdmins
-          ? [{ label: t("nav.admins"), href: "/admins", icon: UserCog }]
-          : []),
+        { label: t("nav.admins"), href: "/admins", icon: UserCog },
       ],
     },
   ]
 
   const initials = admin?.name ? admin.name.charAt(0).toUpperCase() : "A"
   const displayName = admin?.name || t("admin")
-  const displayRole = admin?.role === "super" ? t("superAdmin") : t("admin")
+  const displayRole = t("admin")
 
   return (
     <aside className={cn(

@@ -4,7 +4,7 @@ import { RIDES_URL } from "@/lib/api"
 
 // GET /api/rides/[id] → GET /api/rides/admin/rides/{id}
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const token = request.cookies.get("admin_token")?.value
+  const token = request.cookies.get("backend_token")?.value
   if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const auth = await verifyToken(token)

@@ -7,7 +7,7 @@ function getBackendToken(request: NextRequest) {
 }
 
 async function getAuth(request: NextRequest) {
-  const token = request.cookies.get("admin_token")?.value
+  const token = request.cookies.get("backend_token")?.value
   if (!token) return null
   return verifyToken(token)
 }

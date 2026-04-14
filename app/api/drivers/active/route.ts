@@ -4,7 +4,7 @@ import { API_BASE_URL, RIDES_URL } from "@/lib/api"
 
 // GET /api/drivers/active → location-service active drivers + auth-service driver details
 export async function GET(request: NextRequest) {
-  const token = request.cookies.get("admin_token")?.value
+  const token = request.cookies.get("backend_token")?.value
   if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const auth = await verifyToken(token)
